@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import logo from './assets/images/logo-universal.png';
+import logo from './assets/images/GoPass.png';
 import './App.css';
 import {Greet} from "../wailsjs/go/main/App";
 
