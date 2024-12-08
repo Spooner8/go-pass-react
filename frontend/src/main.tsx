@@ -1,9 +1,11 @@
 import React from 'react'
 import {createRoot} from 'react-dom/client'
-import {HashRouter, Routes, Route} from 'react-router-dom'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import './style.css'
-import { PasswortList } from './components/passwortList'
-import { Unlock } from './components/unlock'
+import './components/components.css'
+import './pages/pages.css'
+import { Unlock } from './pages/unlock'
+import { MainPage } from './pages/mainpage'
 
 const container = document.getElementById('root')
 
@@ -14,8 +16,7 @@ root.render(
         <HashRouter basename={"/"}>
             <Routes>
                 <Route path="/" element={<Unlock />} />
-                <Route path="/unlock" element={<Unlock />} />
-                <Route path="/passwords" element={<PasswortList />} />
+                <Route path="/mainpage" element={<MainPage />} />
             </Routes>
         </HashRouter>
     </React.StrictMode>
