@@ -6,6 +6,8 @@ toolchain go1.23.3
 
 require (
 	github.com/google/uuid v1.3.0
+	github.com/joho/godotenv v1.5.1
+	github.com/labstack/gommon v0.4.0
 	github.com/wailsapp/wails/v2 v2.9.2
 	go.tmthrgd.dev/passit v0.0.0-20240921040427-3da1a78b5f69
 	golang.org/x/crypto v0.23.0
@@ -17,7 +19,6 @@ require (
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/jchv/go-winloader v0.0.0-20210711035445-715c2860da7e // indirect
 	github.com/labstack/echo/v4 v4.10.2 // indirect
-	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/leaanthony/go-ansi-parser v1.6.0 // indirect
 	github.com/leaanthony/gosod v1.0.3 // indirect
 	github.com/leaanthony/slicer v1.6.0 // indirect

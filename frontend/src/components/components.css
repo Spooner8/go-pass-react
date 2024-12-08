@@ -1,0 +1,9 @@
+.card {
+    background: rgba(var(--accent-bg), 0.14);
+    border-radius: 8px;
+    border: 1px solid rgba(var(--primary-bg), 1);
+    box-shadow: 8px 10px 25px rgba(var(--accent-bg), 0.2);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    color: var(--primary-text)
+}
