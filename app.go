@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
+	"go-pass-react/controllers/safeProfile"
 )
 
 // App struct
@@ -38,3 +40,7 @@ func (a *App) GetEnv(key string) string {
 func (a *App) SetEnv(key, value string) {
 	os.Setenv(key, value)
 }
+func (a *App) CreateProfile(profile json.RawMessage) string {
+	return safeProfile.CreateSafeProfile(profile)
+}
+
