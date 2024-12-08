@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useImmer } from "use-immer";
 import { GetEnv } from "../../wailsjs/go/main/App";
 
