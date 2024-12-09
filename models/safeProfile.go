@@ -24,7 +24,7 @@ func (p *SafeProfile) Create(safeProfile SafeProfile) string {
 	file, err := os.OpenFile(safeProfile.FilePath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0644)
 	if err != nil {
 		if os.IsExist(err) {
-			return "Error: File already exists"
+			return "Error: Datei mit diesem Namen existiert bereits!"
 		}
 		return fmt.Sprintf("Error: %s", err.Error())
 	}
