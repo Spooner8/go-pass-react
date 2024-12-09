@@ -40,12 +40,13 @@ func main() {
 	fmt.Println("Your new Key is:", hex.EncodeToString(key))
 }
 ```
+
 Or visit [this website](https://acte.ltd/utils/randomkeygen) to generate a random key.
 Copy the 'Encryption key 256'
 
 ### Requirements
 
-```
+```bash
 go install github.com/wailsapp/wails/v2/cmd/wails@latest
 ```
 
@@ -56,6 +57,7 @@ To run in live development mode, run
 ```bash
 wails dev
 ```
+
 in the project directory. This will run a Vite development
 server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
 and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
@@ -63,7 +65,7 @@ to this in your browser, and you can call your Go code from devtools.
 
 ## Building
 
-To build a redistributable, production mode package, use 
+To build a redistributable, production mode package, use
 
 ```bash
 wails build .
