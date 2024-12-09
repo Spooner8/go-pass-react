@@ -1,7 +1,7 @@
 package password_test
 
 import (
-	"go-pass-react/controlers/password"
+	"go-pass-react/controllers/password"
 	"testing"
 )
 
