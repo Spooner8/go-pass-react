@@ -13,6 +13,8 @@ require (
 	golang.org/x/crypto v0.23.0
 )
 
+require github.com/TheTitanrain/w32 v0.0.0-20180517000239-4f5cfb03fabf // indirect
+
 require (
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
@@ -29,6 +31,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/samber/lo v1.38.1 // indirect
+	github.com/sqweek/dialog v0.0.0-20240226140203-065105509627
 	github.com/tkrajina/go-reflector v0.5.6 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect

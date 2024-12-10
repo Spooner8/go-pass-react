@@ -18,6 +18,10 @@ export function Quit() {
   return window['go']['main']['App']['Quit']();
 }
 
+export function SelectDir() {
+  return window['go']['main']['App']['SelectDir']();
+}
+
 export function SetEnv(arg1, arg2) {
   return window['go']['main']['App']['SetEnv'](arg1, arg2);
 }

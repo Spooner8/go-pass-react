@@ -4,8 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
+	"go-pass-react/controllers/passSystem"
 	"go-pass-react/controllers/safeProfile"
+	"os"
 )
 
 // App struct
@@ -44,3 +45,6 @@ func (a *App) CreateProfile(profile json.RawMessage) string {
 	return safeProfile.CreateSafeProfile(profile)
 }
 
+func (a *App) SelectDir() string {
+	return passSystem.SelectDir()
+}

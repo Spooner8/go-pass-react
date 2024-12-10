@@ -10,4 +10,6 @@ export function Greet(arg1:string):Promise<string>;
 
 export function Quit():Promise<void>;
 
+export function SelectDir():Promise<string>;
+
 export function SetEnv(arg1:string,arg2:string):Promise<void>;
