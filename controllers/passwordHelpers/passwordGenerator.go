@@ -1,4 +1,4 @@
-package password
+package passwordHelpers
 
 import (
 	"crypto/aes"

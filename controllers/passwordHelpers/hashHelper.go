@@ -1,4 +1,4 @@
-package password
+package passwordHelpers
 
 import (
 	"golang.org/x/crypto/bcrypt"
@@ -16,10 +16,7 @@ func HashPassword(password string) (string, error) {
 
 // VerifyPassword verifies a password against a hashed password using bcrypt.
 // It returns true if the password matches the hashed password, false otherwise.
-func VerifyPassword(hashedPassword, password string) (bool, error) {
+func VerifyPassword(hashedPassword, password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
-	if err != nil {
-		return false, err
-	}
-	return true, nil
+	return err == nil
 }

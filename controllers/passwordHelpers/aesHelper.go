@@ -2,7 +2,7 @@
 // It generates a password using the passit package and aes encryption.
 // It hashes the password using bcrypt. (For the Master password)
 // It encrypts and decrypts the password using AES. (For the stored passwords)
-package password
+package passwordHelpers
 
 import (
 	"crypto/aes"
