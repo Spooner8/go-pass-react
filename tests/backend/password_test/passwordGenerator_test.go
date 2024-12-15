@@ -1,12 +1,12 @@
 package password_test
 
 import (
-	"go-pass-react/controllers/password"
+	"go-pass-react/controllers/passwordHelpers"
 	"testing"
 )
 
 func TestGeneratePassword(t *testing.T) {
-	pwd, err := password.GeneratePassword()
+	pwd, err := passwordHelpers.GeneratePassword()
 	if err != nil {
 		t.Errorf("Expected no error, got: %v", err)
 	}

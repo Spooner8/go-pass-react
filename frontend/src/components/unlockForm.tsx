@@ -1,16 +1,26 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { SafeProfile } from '../models/safeProfile';
 import { useNavigate } from 'react-router-dom';
 import { useImmer } from 'use-immer';
-import { GetEnv, CreateProfile } from '../../wailsjs/go/main/App';
+import {
+    GetEnv,
+    SetEnv,
+    CreateProfile,
+    SelectDir,
+    GetProfile,
+    VerifyPassword,
+} from '../../wailsjs/go/main/App';
 
 export function UnlockForm() {
+    const [safeProfile, setSafeProfile] = useImmer<SafeProfile>(
+        {} as SafeProfile
+    );
+
     const [safePath, setSafePath] = useImmer<string>('');
     const [password, setPassword] = useImmer<string>('');
-    const [newPath, setNewPath] = useImmer<string>('');
+    const [newSafePath, setNewSafePath] = useImmer<string>('');
     const [newSafeName, setNewSafeName] = useImmer<string>('');
     const [createNew, setCreateNew] = useImmer<boolean>(false);
-    const [open, setOpen] = useImmer<boolean>(false);
     const [newMasterPassword, setNewMasterPassword] = useImmer<string>('');
     const [confirmNewMasterPassword, setConfirmNewMasterPassword] =
         useImmer<string>('');
@@ -27,8 +37,8 @@ export function UnlockForm() {
 
     const handleUnlock = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
-        // TODO unlock safe
-        navigate('/mainpage');
+        const response = await VerifyPassword(safeProfile.masterpassword, password);
+        response ? navigate('/mainpage') : setErrorMessage('Wrong password');
     };
 
     useEffect(() => {
@@ -43,16 +53,14 @@ export function UnlockForm() {
         event: React.MouseEvent<HTMLButtonElement>
     ) => {
         event.preventDefault();
-        // TODO create new safe
         const newSafeProfile: SafeProfile = {
             id: '',
             name: newSafeName,
-            storagPath: newPath,
-            masterKey: newMasterPassword,
+            filepath: `${newSafePath}\\${newSafeName}.gopass`,
+            masterpassword: newMasterPassword,
             passwords: [],
             createdAt: new Date(),
         };
-        console.log(newSafeProfile);
         try {
             await CreateProfile(newSafeProfile).then((response) => {
                 response !== 'created' && setErrorMessage(response);
@@ -60,7 +68,7 @@ export function UnlockForm() {
                 setConfirmNewMasterPassword('');
                 setNewMasterPassword('');
                 setValidateNewMasterPassword(false);
-                setOpen(false);
+                SetEnv('LAST_PATH', newSafeProfile.filepath);
             });
         } catch (error: any) {
             setErrorMessage('Error creating safe');
@@ -69,7 +77,20 @@ export function UnlockForm() {
 
     const chooseFolder = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
-        // TODO choose folder: Create a controller for that. because it is not possible to use the window object in react (Browser API)
+        const filePath = await SelectDir();
+        filePath && setNewSafePath(filePath);
+    };
+
+    const handleOpenSafe = async (
+        event: React.MouseEvent<HTMLButtonElement>
+    ) => {
+        event.preventDefault();
+        setCreateNew(false);
+        await GetProfile().then((response) => {
+            setSafeProfile(response);
+            setSafePath(response.filepath);
+            SetEnv('LAST_PATH', response.filepath);
+        });
     };
 
     return (
@@ -104,7 +125,9 @@ export function UnlockForm() {
                                     <button
                                         className='btn btn-primary w-100 mb-4'
                                         id='btn-new'
-                                        onClick={(e) => setCreateNew(true)}
+                                        onClick={() => {
+                                            setCreateNew(!createNew);
+                                        }}
                                     >
                                         <i className='bi bi-plus-circle me-2'></i>
                                         Neuer Tresor
@@ -115,6 +138,7 @@ export function UnlockForm() {
                                         className='btn btn-primary w-100'
                                         id='btn-open'
                                         type='button'
+                                        onClick={handleOpenSafe}
                                     >
                                         <i className='bi bi-folder2-open me-2'></i>
                                         Tresor Öffnen
@@ -123,11 +147,7 @@ export function UnlockForm() {
                             </div>
                             {createNew && (
                                 <div className='row mt-4'>
-                                    <div className='col-sm-12'>
-                                        <small className='text-danger'>
-                                            {errorMessage}
-                                        </small>
-                                    </div>
+                                    <div className='col-sm-12'></div>
                                     <div className='col-sm-12'>
                                         <input
                                             type='text'
@@ -155,7 +175,7 @@ export function UnlockForm() {
                                                 className='form-control'
                                                 placeholder='Speicherort'
                                                 readOnly
-                                                value={newPath}
+                                                value={newSafePath}
                                             />
                                         </div>
                                         <input
@@ -193,7 +213,7 @@ export function UnlockForm() {
                                             type='button'
                                             disabled={
                                                 !newSafeName ||
-                                                !newPath ||
+                                                !newSafePath ||
                                                 !newMasterPassword ||
                                                 !confirmNewMasterPassword ||
                                                 !validateNewMasterPassword
@@ -205,26 +225,14 @@ export function UnlockForm() {
                                     </div>
                                 </div>
                             )}
-                            {open && (
-                                <div className='row'>
-                                    <input
-                                        type='file'
-                                        value={newPath}
-                                        onChange={(e) =>
-                                            setSafePath(e.target.value)
-                                        }
-                                        className='form-control mb-4'
-                                        placeholder='Tresorpfad'
-                                    />
-                                    <button
-                                        className='btn btn-primary'
-                                        type='button'
-                                    >
-                                        Öffnen
-                                    </button>
-                                </div>
-                            )}
                         </>
+                    )}
+                    {errorMessage && (
+                        <div className='row'>
+                            <small className='text-danger col-sm-12'>
+                                {errorMessage}
+                            </small>
+                        </div>
                     )}
                 </div>
             </div>

@@ -10,6 +10,10 @@ export function GetEnv(arg1) {
   return window['go']['main']['App']['GetEnv'](arg1);
 }
 
+export function GetProfile() {
+  return window['go']['main']['App']['GetProfile']();
+}
+
 export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
 }
@@ -18,6 +22,14 @@ export function Quit() {
   return window['go']['main']['App']['Quit']();
 }
 
+export function SelectDir() {
+  return window['go']['main']['App']['SelectDir']();
+}
+
 export function SetEnv(arg1, arg2) {
   return window['go']['main']['App']['SetEnv'](arg1, arg2);
+}
+
+export function VerifyPassword(arg1, arg2) {
+  return window['go']['main']['App']['VerifyPassword'](arg1, arg2);
 }
