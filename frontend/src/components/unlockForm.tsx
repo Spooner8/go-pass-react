@@ -38,7 +38,7 @@ export function UnlockForm() {
     const handleUnlock = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         const response = await VerifyPassword(safeProfile.masterpassword, password);
-        response ? navigate('/mainpage') : setErrorMessage('Wrong password');
+        response ? navigate('/mainpage', { state: safeProfile }) : setErrorMessage('Wrong password');
     };
 
     useEffect(() => {
