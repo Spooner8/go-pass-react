@@ -13,3 +13,11 @@ func SelectDir() string {
 	}
 	return filePath
 }
+
+func SelectFile() string {
+	filePath, err := dialog.File().Title("Datei auswählen").Filter("GOPASS-Dateien", "gopass").Load()
+	if err != nil {
+		return ""
+	}
+	return filePath
+}
