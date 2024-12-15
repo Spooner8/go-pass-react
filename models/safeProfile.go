@@ -3,74 +3,71 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"go-pass-react/controllers/passwordHelpers"
 	"os"
+
+	"github.com/google/uuid"
 )
 
 type SafeProfile struct {
 	Id             string          `json:"id"`
 	Name           string          `json:"name"`
-	FilePath       string          `json:"path"`
+	FilePath       string          `json:"filepath"`
 	Masterpassword string          `json:"masterpassword"`
 	Passwords      []PasswordEntry `json:"passwords"`
 	CreatedAt      string          `json:"createdAt"`
 }
 
-func (p *SafeProfile) Create(safeProfile SafeProfile) string {
-	jsonData, err := json.Marshal(safeProfile)
+func (p *SafeProfile) Create() string {
+	p.Id = generateNewID()
+	hashedPassword, err := passwordHelpers.HashPassword(p.Masterpassword)
 	if err != nil {
-		return fmt.Sprintf("Error: %s", err.Error())
+		return fmt.Sprintf("error: %s", err.Error())
 	}
+	p.Masterpassword = hashedPassword
 
-	file, err := os.OpenFile(safeProfile.FilePath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0644)
+	jsonData, err := json.Marshal(p)
+	if err != nil {
+		return fmt.Sprintf("error while marshal: %s", err.Error())
+	}
+	
+	file, err := os.OpenFile(p.FilePath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0644)
 	if err != nil {
 		if os.IsExist(err) {
-			return "Error: Datei mit diesem Namen existiert bereits!"
+			return "error: Datei mit diesem Namen existiert bereits!"
 		}
-		return fmt.Sprintf("Error: %s", err.Error())
+		return fmt.Sprintf("error while open: %s", err.Error())
 	}
 	defer file.Close()
 
 	_, err = file.Write(jsonData)
 	if err != nil {
-		return fmt.Sprintf("Error: %s", err.Error())
+		return fmt.Sprintf("error while writing: %s", err.Error())
 	}
 
 	return "created"
 }
 
-func (p *SafeProfile) Get() (SafeProfile, error) {
-	file, err := os.Open(p.FilePath)
+func (p *SafeProfile) Update() string {
+	jsonData, err := json.Marshal(p)
 	if err != nil {
-		return SafeProfile{}, err
-	}
-	defer file.Close()
-
-	decoder := json.NewDecoder(file)
-	safeProfile := SafeProfile{}
-	err = decoder.Decode(&safeProfile)
-	if err != nil {
-		return SafeProfile{}, err
+		return fmt.Sprintf("error: %s", err.Error())
 	}
 
-	return safeProfile, nil
-}
-
-func (p *SafeProfile) Update(safeProfile SafeProfile) string {
-	jsonData, err := json.Marshal(safeProfile)
+	file, err := os.OpenFile(p.FilePath, os.O_RDWR, 0644)
 	if err != nil {
-		return fmt.Sprintf("Error: %s", err.Error())
-	}
-
-	file, err := os.OpenFile(safeProfile.FilePath, os.O_RDWR, 0644)
-	if err != nil {
-		return fmt.Sprintf("Error: %s", err.Error())
+		return fmt.Sprintf("error: %s", err.Error())
 	}
 	defer file.Close()
 
 	_, err = file.Write(jsonData)
 	if err != nil {
-		return fmt.Sprintf("Error: %s", err.Error())
+		return fmt.Sprintf("error: %s", err.Error())
 	}
 
 	return "updated"
+}
+
+func generateNewID() string {
+	return uuid.New().String()
 }
