@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"go-pass-react/controllers/passwordHelpers"
 	"go-pass-react/controllers/passSystem"
 	"go-pass-react/controllers/safeProfile"
 	"os"
@@ -41,10 +42,19 @@ func (a *App) GetEnv(key string) string {
 func (a *App) SetEnv(key, value string) {
 	os.Setenv(key, value)
 }
+
 func (a *App) CreateProfile(profile json.RawMessage) string {
 	return safeProfile.CreateSafeProfile(profile)
 }
 
+func (a *App) GetProfile() (json.RawMessage, error) {
+	return safeProfile.GetSafeProfile()
+}
+
 func (a *App) SelectDir() string {
 	return passSystem.SelectDir()
+}
+
+func (a *App) VerifyPassword(hashedPassword, password string) bool {
+	return passwordHelpers.VerifyPassword(hashedPassword, password)
 }
