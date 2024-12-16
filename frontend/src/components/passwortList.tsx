@@ -17,19 +17,17 @@ export function PasswortList({ safeProfile }: Props) {
     const [editing, setEditing] = useState<boolean>(false);
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
-    const [editTitle, setEditTitle] = useState<string>('');
+    // const [editTitle, setEditTitle] = useState<string>('');
     const [editUsername, setEditUsername] = useState<string>('');
     const [editUrl, setEditUrl] = useState<string>('');
     const [editPassword, setEditPassword] = useState<string>('');
     const [editNotes, setEditNotes] = useState<string>('');
 
+    const [ editEntryModel, setEditEntryModel ] = useState<PasswordEntry | null>(null);
+
     useEffect(() => {
         if (selectedPassword) {
-            setEditTitle(selectedPassword?.title || '');
-            setEditUsername(selectedPassword?.username || '');
-            setEditUrl(selectedPassword?.url || '');
-            setEditPassword(selectedPassword?.password || '');
-            setEditNotes(selectedPassword?.notes || '');
+            setEditEntryModel(selectedPassword);
         }
         setEditing(false);
         setShowPassword(false);
@@ -120,13 +118,13 @@ export function PasswortList({ safeProfile }: Props) {
                                             }`}
                                             id='title'
                                             value={
-                                                editing
-                                                    ? editTitle
-                                                    : selectedPassword?.title ||
-                                                      ''
+                                                editing ? editEntryModel?.title : selectedPassword?.title || ''
                                             }
                                             onChange={(e) =>
-                                                setEditTitle(e.target.value)
+                                                setEditEntryModel({
+                                                    ...editEntryModel!,
+                                                    title: e.target.value
+                                                })
                                             }
                                             readOnly={!editing}
                                         />
@@ -146,12 +144,15 @@ export function PasswortList({ safeProfile }: Props) {
                                             id='username'
                                             value={
                                                 editing
-                                                    ? editUsername
+                                                    ? editEntryModel?.username
                                                     : selectedPassword?.username ||
                                                       ''
                                             }
                                             onChange={(e) =>
-                                                setEditUsername(e.target.value)
+                                                setEditEntryModel({
+                                                    ...editEntryModel!,
+                                                    username: e.target.value
+                                                })
                                             }
                                             readOnly={!editing}
                                         />
@@ -171,12 +172,15 @@ export function PasswortList({ safeProfile }: Props) {
                                             id='url'
                                             value={
                                                 editing
-                                                    ? editUrl
+                                                    ? editEntryModel?.url
                                                     : selectedPassword?.url ||
                                                       ''
                                             }
                                             onChange={(e) =>
-                                                setEditUrl(e.target.value)
+                                                setEditEntryModel({
+                                                    ...editEntryModel!,
+                                                    url: e.target.value
+                                                })
                                             }
                                             readOnly={!editing}
                                         />
@@ -201,14 +205,15 @@ export function PasswortList({ safeProfile }: Props) {
                                                 id='password'
                                                 value={
                                                     editing
-                                                        ? editPassword
+                                                        ? editEntryModel?.password
                                                         : selectedPassword?.password ||
                                                           ''
                                                 }
                                                 onChange={(e) =>
-                                                    setEditPassword(
-                                                        e.target.value
-                                                    )
+                                                    setEditEntryModel({
+                                                        ...editEntryModel!,
+                                                        password: e.target.value
+                                                    })
                                                 }
                                                 readOnly={!editing}
                                             />
@@ -240,11 +245,14 @@ export function PasswortList({ safeProfile }: Props) {
                                         id='notes'
                                         value={
                                             editing
-                                                ? editNotes
+                                                ? editEntryModel?.notes
                                                 : selectedPassword?.notes || ''
                                         }
                                         onChange={(e) =>
-                                            setEditNotes(e.target.value)
+                                            setEditEntryModel({
+                                                ...editEntryModel!,
+                                                notes: e.target.value
+                                            })
                                         }
                                         readOnly={!editing}
                                     />
