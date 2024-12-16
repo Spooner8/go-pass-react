@@ -10,7 +10,7 @@ export function MainPage() {
     <div className="container">
         <div className="row">
             <div className="col">
-                <h4>Tresor: {safeProfile.name}</h4>
+                <h4 className="mb-4">Tresor: {safeProfile.name}</h4>
                 <PasswortList safeProfile={safeProfile} />
             </div>
         </div>

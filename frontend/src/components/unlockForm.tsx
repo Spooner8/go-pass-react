@@ -110,20 +110,35 @@ export function UnlockForm() {
                         disabled={!safePath}
                     />
                     {safePath ? (
-                        <button
-                            className='btn btn-primary'
-                            id='btn-unlock'
-                            disabled={!password}
-                            onClick={handleUnlock}
-                        >
-                            Entsperren
-                        </button>
+                        <div className='row'>
+                            <div className='col-sm-12 col-md-6'>
+                                <button
+                                    className='btn btn-primary w-100'
+                                    id='btn-unlock'
+                                    disabled={!password}
+                                    onClick={handleUnlock}
+                                    >
+                                    Entsperren
+                                </button>
+                            </div>
+                            <div className='col-sm-12 col-md-6'>
+                                <button
+                                    className='btn btn-primary w-100'
+                                    id='btn-open'
+                                    type='button'
+                                    onClick={handleOpenSafe}
+                                    >
+                                    <i className='bi bi-folder2-open me-2'></i>
+                                    Tresor Öffnen
+                                </button>
+                            </div>
+                        </div>
                     ) : (
                         <>
                             <div className='row'>
                                 <div className='col-sm-12 col-md-6'>
                                     <button
-                                        className='btn btn-primary w-100 mb-4'
+                                        className='btn btn-primary w-100'
                                         id='btn-new'
                                         onClick={() => {
                                             setCreateNew(!createNew);
@@ -139,11 +154,11 @@ export function UnlockForm() {
                                         id='btn-open'
                                         type='button'
                                         onClick={handleOpenSafe}
-                                    >
+                                        >
                                         <i className='bi bi-folder2-open me-2'></i>
                                         Tresor Öffnen
                                     </button>
-                                </div>
+                                </div>                                
                             </div>
                             {createNew && (
                                 <div className='row mt-4'>
