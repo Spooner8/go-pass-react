@@ -30,6 +30,10 @@ export function SetEnv(arg1, arg2) {
   return window['go']['main']['App']['SetEnv'](arg1, arg2);
 }
 
+export function UpdateProfile(arg1) {
+  return window['go']['main']['App']['UpdateProfile'](arg1);
+}
+
 export function VerifyPassword(arg1, arg2) {
   return window['go']['main']['App']['VerifyPassword'](arg1, arg2);
 }

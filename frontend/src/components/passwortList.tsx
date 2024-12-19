@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactNode } from 'react';
 import { PasswordEntry, mockPasswords } from '../models/passwordEntry';
 import { SafeProfile } from '../models/safeProfile';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
+import { UpdateProfile } from '../../wailsjs/go/main/App';
 
 interface Props {
     safeProfile: SafeProfile;
@@ -17,12 +18,6 @@ export function PasswortList({ safeProfile }: Props) {
     const [editing, setEditing] = useState<boolean>(false);
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
-    // const [editTitle, setEditTitle] = useState<string>('');
-    const [editUsername, setEditUsername] = useState<string>('');
-    const [editUrl, setEditUrl] = useState<string>('');
-    const [editPassword, setEditPassword] = useState<string>('');
-    const [editNotes, setEditNotes] = useState<string>('');
-
     const [ editEntryModel, setEditEntryModel ] = useState<PasswordEntry | null>(null);
 
     useEffect(() => {
@@ -33,9 +28,32 @@ export function PasswortList({ safeProfile }: Props) {
         setShowPassword(false);
     }, [selectedPassword]);
 
-    const handleEdit = () => {
-        setEditing(true);
+    const updateSafeProfile = () => {
+        let upToDate = false;
+
+        const update = async () => {
+            await UpdateProfile(safeProfile).then(() => {
+                upToDate = true;
+            });
+        };        
     };
+
+    const handleSave = () => {
+        if (editEntryModel) {
+            const index = passwords.findIndex(p => p.id === editEntryModel.id);
+            if (index >= 0) {
+                const newPasswords = [...passwords];
+                newPasswords[index] = editEntryModel;
+                setPasswords(newPasswords);
+            } else {
+                setPasswords([...passwords, editEntryModel]);
+            }
+            setEditEntryModel(null);
+        }
+    };
+
+    const editBtn: ReactNode = <i className="bi bi-pencil-square"></i>;
+    const abortBtn: ReactNode = <i className="bi bi-x-lg"></i>;
 
     return (
         <>
@@ -94,11 +112,19 @@ export function PasswortList({ safeProfile }: Props) {
                 <div className='col-sm-12'>
                     <div className='card'>
                         <div className='card-header d-flex justify-content-end'>
+                            {editing && (
+                                <button
+                                    className='btn btn-success me-2 save-entry'
+                                    onClick={handleSave}
+                                >
+                                    <i className="bi bi-floppy"></i>
+                                </button>
+                            )}
                             <button
                                 className='btn btn-primary'
-                                onClick={() => handleEdit()}
+                                onClick={() => setEditing(!editing)}
                             >
-                                Bearbeiten
+                                {editing ? abortBtn : editBtn}
                             </button>
                         </div>
                         <div className='card-body'>

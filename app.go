@@ -47,6 +47,10 @@ func (a *App) CreateProfile(profile json.RawMessage) string {
 	return safeProfile.CreateSafeProfile(profile)
 }
 
+func (a *App) UpdateProfile(profile json.RawMessage) string {
+	return safeProfile.UpdateSafeProfile(profile)
+}
+
 func (a *App) GetProfile() (json.RawMessage, error) {
 	return safeProfile.GetSafeProfile()
 }

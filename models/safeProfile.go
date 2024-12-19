@@ -54,6 +54,8 @@ func (p *SafeProfile) Update() string {
 		return fmt.Sprintf("error: %s", err.Error())
 	}
 
+	checkNewEntries(&p.Passwords)
+
 	file, err := os.OpenFile(p.FilePath, os.O_RDWR, 0644)
 	if err != nil {
 		return fmt.Sprintf("error: %s", err.Error())
@@ -66,6 +68,14 @@ func (p *SafeProfile) Update() string {
 	}
 
 	return "updated"
+}
+
+func checkNewEntries(entries *[]PasswordEntry) {
+	for i := range *entries {
+		if (*entries)[i].Id == "" {
+			(*entries)[i].Id = generateNewID()
+		}
+	}
 }
 
 func generateNewID() string {
