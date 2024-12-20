@@ -49,12 +49,12 @@ func (p *SafeProfile) Create() string {
 }
 
 func (p *SafeProfile) Update() string {
+	checkNewEntries(&p.Passwords)
+
 	jsonData, err := json.Marshal(p)
 	if err != nil {
 		return fmt.Sprintf("error: %s", err.Error())
 	}
-
-	checkNewEntries(&p.Passwords)
 
 	file, err := os.OpenFile(p.FilePath, os.O_RDWR, 0644)
 	if err != nil {

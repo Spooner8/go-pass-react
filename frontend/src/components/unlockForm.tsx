@@ -3,8 +3,6 @@ import { SafeProfile } from '../models/safeProfile';
 import { useNavigate } from 'react-router-dom';
 import { useImmer } from 'use-immer';
 import {
-    GetEnv,
-    SetEnv,
     CreateProfile,
     SelectDir,
     GetProfile,
@@ -31,7 +29,6 @@ export function UnlockForm() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        GetEnv('LAST_PATH').then(setSafePath);
         safePath ? console.log(safePath) : console.log('No safe path found');
     }, []);
 
@@ -68,7 +65,6 @@ export function UnlockForm() {
                 setConfirmNewMasterPassword('');
                 setNewMasterPassword('');
                 setValidateNewMasterPassword(false);
-                SetEnv('LAST_PATH', newSafeProfile.filepath);
             });
         } catch (error: any) {
             setErrorMessage('Error creating safe');
@@ -89,7 +85,6 @@ export function UnlockForm() {
         await GetProfile().then((response) => {
             setSafeProfile(response);
             setSafePath(response.filepath);
-            SetEnv('LAST_PATH', response.filepath);
         });
     };
 

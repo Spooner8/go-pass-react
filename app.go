@@ -39,10 +39,6 @@ func (a *App) GetEnv(key string) string {
 	return os.Getenv(key)
 }
 
-func (a *App) SetEnv(key, value string) {
-	os.Setenv(key, value)
-}
-
 func (a *App) CreateProfile(profile json.RawMessage) string {
 	return safeProfile.CreateSafeProfile(profile)
 }
@@ -53,6 +49,10 @@ func (a *App) UpdateProfile(profile json.RawMessage) string {
 
 func (a *App) GetProfile() (json.RawMessage, error) {
 	return safeProfile.GetSafeProfile()
+}
+
+func (a *App) GetProfileFromPath(filePath string) (json.RawMessage, error) {
+	return safeProfile.GetSafeProfileFromPath(filePath)
 }
 
 func (a *App) SelectDir() string {
