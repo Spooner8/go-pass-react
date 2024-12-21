@@ -8,13 +8,11 @@ export function GetEnv(arg1:string):Promise<string>;
 
 export function GetProfile():Promise<json.RawMessage>;
 
-export function Greet(arg1:string):Promise<string>;
+export function GetProfileFromPath(arg1:string):Promise<json.RawMessage>;
 
 export function Quit():Promise<void>;
 
 export function SelectDir():Promise<string>;
-
-export function SetEnv(arg1:string,arg2:string):Promise<void>;
 
 export function UpdateProfile(arg1:json.RawMessage):Promise<string>;
 

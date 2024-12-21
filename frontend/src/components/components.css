@@ -26,3 +26,8 @@
     border-width: 0;
     cursor: pointer;
 }
+
+.p-datatable-wrapper {
+    border-radius: 8px;
+    min-height: 300px;
+}

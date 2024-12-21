@@ -16,6 +16,7 @@ type SafeProfile struct {
 	Masterpassword string          `json:"masterpassword"`
 	Passwords      []PasswordEntry `json:"passwords"`
 	CreatedAt      string          `json:"createdAt"`
+	UpdatedAt      string          `json:"updatedAt"`
 }
 
 func (p *SafeProfile) Create() string {
@@ -49,25 +50,25 @@ func (p *SafeProfile) Create() string {
 }
 
 func (p *SafeProfile) Update() string {
-	checkNewEntries(&p.Passwords)
+    checkNewEntries(&p.Passwords)
 
-	jsonData, err := json.Marshal(p)
-	if err != nil {
-		return fmt.Sprintf("error: %s", err.Error())
-	}
+    jsonData, err := json.Marshal(p)
+    if err != nil {
+        return fmt.Sprintf("error: %s", err.Error())
+    }
 
-	file, err := os.OpenFile(p.FilePath, os.O_RDWR, 0644)
-	if err != nil {
-		return fmt.Sprintf("error: %s", err.Error())
-	}
-	defer file.Close()
+    file, err := os.OpenFile(p.FilePath, os.O_RDWR|os.O_TRUNC, 0644)
+    if err != nil {
+        return fmt.Sprintf("error: %s", err.Error())
+    }
+    defer file.Close()
 
-	_, err = file.Write(jsonData)
-	if err != nil {
-		return fmt.Sprintf("error: %s", err.Error())
-	}
+    _, err = file.Write(jsonData)
+    if err != nil {
+        return fmt.Sprintf("error: %s", err.Error())
+    }
 
-	return "updated"
+    return "updated"
 }
 
 func checkNewEntries(entries *[]PasswordEntry) {

@@ -7,4 +7,5 @@ export interface SafeProfile {
     masterpassword: string;
     passwords: PasswordEntry[];
     createdAt: Date;
+    updatedAt?: Date;
 }

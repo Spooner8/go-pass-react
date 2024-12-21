@@ -4,53 +4,75 @@ import { SafeProfile } from '../models/safeProfile';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
-import { UpdateProfile } from '../../wailsjs/go/main/App';
+import { UpdateProfile, GetProfileFromPath } from '../../wailsjs/go/main/App';
 
 interface Props {
     safeProfile: SafeProfile;
 }
 
 export function PasswortList({ safeProfile }: Props) {
-    const [passwords, setPasswords] = useState<PasswordEntry[]>(mockPasswords);
+    const [ profile, setProfile ] = useState<SafeProfile>(safeProfile);
     const [globalFilter, setGlobalFilter] = useState<string>('');
     const [selectedPassword, setSelectedPassword] =
         useState<PasswordEntry | null>(null);
     const [editing, setEditing] = useState<boolean>(false);
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
-    const [ editEntryModel, setEditEntryModel ] = useState<PasswordEntry | null>(null);
+    useEffect(() => {
+        GetProfileFromPath(safeProfile.filepath).then((response) => {
+            setProfile(response);
+        });
+    }, []);
 
     useEffect(() => {
-        if (selectedPassword) {
-            setEditEntryModel(selectedPassword);
-        }
-        setEditing(false);
         setShowPassword(false);
-    }, [selectedPassword]);
-
-    const updateSafeProfile = () => {
-        let upToDate = false;
-
-        const update = async () => {
-            await UpdateProfile(safeProfile).then(() => {
-                upToDate = true;
-            });
-        };        
-    };
-
-    const handleSave = () => {
-        if (editEntryModel) {
-            const index = passwords.findIndex(p => p.id === editEntryModel.id);
-            if (index >= 0) {
-                const newPasswords = [...passwords];
-                newPasswords[index] = editEntryModel;
-                setPasswords(newPasswords);
-            } else {
-                setPasswords([...passwords, editEntryModel]);
+        setSelectedPassword(prev => {
+            if (prev) {
+                return profile.passwords.find(p => p.id === prev.id) || null;
             }
-            setEditEntryModel(null);
-        }
+            return null;
+        });
+    }, [editing]);
+
+    const handleAddPassword = () => {
+        profile.passwords.push({
+            id: '',
+            title: '',
+            url: '',
+            username: '',
+            password: '',
+            notes: '',
+            createdAt: new Date(),
+        });
+
+        setSelectedPassword(profile.passwords[profile.passwords.length - 1]);
+        setEditing(true);
+    }
+
+    const updateSafeProfile = async () => {
+        const updatedPasswords = profile.passwords.map(p => {
+            if (p.id === selectedPassword?.id) {
+                return { ...selectedPassword, updatedAt: new Date() } as PasswordEntry;
+            }
+            return p;
+        });
+
+        const updatedProfile = { ...profile, passwords: updatedPasswords };
+        setProfile(updatedProfile);
+
+        await UpdateProfile(updatedProfile).then(async () => {
+            await GetProfileFromPath(updatedProfile.filepath).then((response) => {
+                setProfile(response);
+                setEditing(false);
+                setSelectedPassword(null);
+            });
+        });
     };
+
+    const dateBodyTemplate = (rowData: PasswordEntry) => {
+        const date = rowData.updatedAt && new Date(rowData.updatedAt || '');
+        return date ? date?.toLocaleDateString() : '';
+    }
 
     const editBtn: ReactNode = <i className="bi bi-pencil-square"></i>;
     const abortBtn: ReactNode = <i className="bi bi-x-lg"></i>;
@@ -74,22 +96,26 @@ export function PasswortList({ safeProfile }: Props) {
                         />
                     </div>
                 </div>
-                <div className='col-md-6'>
+                <div className='col-md-1'>
+                    <button className='btn btn-primary' onClick={handleAddPassword}>
+                        <i className="bi bi-plus-circle"></i>
+                    </button>
+                </div>
+                <div className='col-md-5'>
                     <div className='col-sm-12 mt-2 d-flex justify-content-end'>
-                        <small>Anzahl Passwörter: {passwords.length}</small>
+                        <small>Anzahl Passwörter: {profile.passwords.length}</small>
                     </div>
                 </div>
             </div>
             <DataTable
-                className=''
-                value={passwords}
+                value={profile.passwords}
                 dataKey={'id'}
                 selectionMode={'single'}
                 selection={selectedPassword}
                 onSelectionChange={(e) =>
                     setSelectedPassword(e.value as PasswordEntry)
                 }
-                rows={10}
+                rows={3}
                 scrollable
                 scrollHeight='300px'
                 globalFilter={globalFilter}
@@ -106,6 +132,12 @@ export function PasswortList({ safeProfile }: Props) {
                 <Column field='url' header='URL' sortable />
                 <Column field='username' header='Benutzername' sortable />
                 <Column field='notes' header='Notes' sortable />
+                <Column 
+                    field='updatedAt' 
+                    header='Bearbeitet' 
+                    sortable 
+                    body={dateBodyTemplate}
+                />
             </DataTable>
 
             <div className='row mt-4'>
@@ -115,7 +147,7 @@ export function PasswortList({ safeProfile }: Props) {
                             {editing && (
                                 <button
                                     className='btn btn-success me-2 save-entry'
-                                    onClick={handleSave}
+                                    onClick={updateSafeProfile}
                                 >
                                     <i className="bi bi-floppy"></i>
                                 </button>
@@ -123,6 +155,7 @@ export function PasswortList({ safeProfile }: Props) {
                             <button
                                 className='btn btn-primary'
                                 onClick={() => setEditing(!editing)}
+                                disabled={!selectedPassword}
                             >
                                 {editing ? abortBtn : editBtn}
                             </button>
@@ -143,15 +176,8 @@ export function PasswortList({ safeProfile }: Props) {
                                                 !editing ? 'editDetail' : ''
                                             }`}
                                             id='title'
-                                            value={
-                                                editing ? editEntryModel?.title : selectedPassword?.title || ''
-                                            }
-                                            onChange={(e) =>
-                                                setEditEntryModel({
-                                                    ...editEntryModel!,
-                                                    title: e.target.value
-                                                })
-                                            }
+                                            value={selectedPassword?.title || ''}
+                                            onChange={(e) => setSelectedPassword({ ...selectedPassword, title: e.target.value } as PasswordEntry)}
                                             readOnly={!editing}
                                         />
                                     </div>
@@ -168,19 +194,10 @@ export function PasswortList({ safeProfile }: Props) {
                                                 !editing ? 'editDetail' : ''
                                             }`}
                                             id='username'
-                                            value={
-                                                editing
-                                                    ? editEntryModel?.username
-                                                    : selectedPassword?.username ||
-                                                      ''
-                                            }
-                                            onChange={(e) =>
-                                                setEditEntryModel({
-                                                    ...editEntryModel!,
-                                                    username: e.target.value
-                                                })
-                                            }
+                                            value={selectedPassword?.username || ''}
+                                            onChange={(e) => setSelectedPassword({ ...selectedPassword, username: e.target.value } as PasswordEntry)}
                                             readOnly={!editing}
+                                            required
                                         />
                                     </div>
                                     <div className='hstack gap-3 mb-2'>
@@ -196,18 +213,8 @@ export function PasswortList({ safeProfile }: Props) {
                                                 !editing ? 'editDetail' : ''
                                             }`}
                                             id='url'
-                                            value={
-                                                editing
-                                                    ? editEntryModel?.url
-                                                    : selectedPassword?.url ||
-                                                      ''
-                                            }
-                                            onChange={(e) =>
-                                                setEditEntryModel({
-                                                    ...editEntryModel!,
-                                                    url: e.target.value
-                                                })
-                                            }
+                                            value={selectedPassword?.url || ''}
+                                            onChange={(e) => setSelectedPassword({ ...selectedPassword, url: e.target.value } as PasswordEntry)}
                                             readOnly={!editing}
                                         />
                                     </div>
@@ -229,19 +236,10 @@ export function PasswortList({ safeProfile }: Props) {
                                                     !editing ? 'editDetail' : ''
                                                 }`}
                                                 id='password'
-                                                value={
-                                                    editing
-                                                        ? editEntryModel?.password
-                                                        : selectedPassword?.password ||
-                                                          ''
-                                                }
-                                                onChange={(e) =>
-                                                    setEditEntryModel({
-                                                        ...editEntryModel!,
-                                                        password: e.target.value
-                                                    })
-                                                }
+                                                value={selectedPassword?.password || ''}
+                                                onChange={(e) => setSelectedPassword({ ...selectedPassword, password: e.target.value } as PasswordEntry)}
                                                 readOnly={!editing}
+                                                required
                                             />
                                             <span className='input-group-text password-toggle'>
                                                 <i
@@ -269,17 +267,8 @@ export function PasswortList({ safeProfile }: Props) {
                                             !editing ? 'editDetail' : ''
                                         } flex-grow-1`}
                                         id='notes'
-                                        value={
-                                            editing
-                                                ? editEntryModel?.notes
-                                                : selectedPassword?.notes || ''
-                                        }
-                                        onChange={(e) =>
-                                            setEditEntryModel({
-                                                ...editEntryModel!,
-                                                notes: e.target.value
-                                            })
-                                        }
+                                        value={selectedPassword?.notes || ''}
+                                        onChange={(e) => setSelectedPassword({ ...selectedPassword, notes: e.target.value } as PasswordEntry)}
                                         readOnly={!editing}
                                     />
                                 </div>

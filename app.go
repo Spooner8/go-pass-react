@@ -3,9 +3,8 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"go-pass-react/controllers/passwordHelpers"
 	"go-pass-react/controllers/passSystem"
+	"go-pass-react/controllers/passwordHelpers"
 	"go-pass-react/controllers/safeProfile"
 	"os"
 )
@@ -28,11 +27,6 @@ func (a *App) startup(ctx context.Context) {
 
 func (a *App) Quit() {
 	a.ctx.Done()
-}
-
-// Greet returns a greeting for the given name
-func (a *App) Greet(name string) string {
-	return fmt.Sprintf("Hello %s, It's show time!", name)
 }
 
 func (a *App) GetEnv(key string) string {
