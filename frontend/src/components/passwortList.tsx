@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ReactNode } from 'react';
-import { PasswordEntry, mockPasswords } from '../models/passwordEntry';
+import { PasswordEntry } from '../models/passwordEntry';
 import { SafeProfile } from '../models/safeProfile';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
