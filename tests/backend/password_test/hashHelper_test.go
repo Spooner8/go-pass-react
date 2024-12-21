@@ -1,13 +1,13 @@
 package password_test
 
 import (
-	"go-pass-react/controlers/password"
+	"go-pass-react/controllers/passwordHelpers"
 	"testing"
 )
 
 func TestHashPassword(t *testing.T) {
 	pwd := "mysecretpassword"
-	hashedPassword, err := password.HashPassword(pwd)
+	hashedPassword, err := passwordHelpers.HashPassword(pwd)
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
 	}
@@ -21,15 +21,12 @@ func TestHashPassword(t *testing.T) {
 
 func TestVerifyPassword(t *testing.T) {
 	pwd := "mysecretpassword"
-	hashedPassword, err := password.HashPassword(pwd)
+	hashedPassword, err := passwordHelpers.HashPassword(pwd)
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
 	}
 
-	verified, err := password.VerifyPassword(hashedPassword, pwd)
-	if err != nil {
-		t.Fatalf("Expected no error, got: %v", err)
-	}
+	verified := passwordHelpers.VerifyPassword(hashedPassword, pwd)
 
 	if !verified {
 		t.Fatalf("Expected password to be verified, but it was not")

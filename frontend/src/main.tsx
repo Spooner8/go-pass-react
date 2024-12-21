@@ -6,6 +6,7 @@ import './components/components.css'
 import './pages/pages.css'
 import { Unlock } from './pages/unlock'
 import { MainPage } from './pages/mainpage'
+import 'primereact/resources/themes/bootstrap4-dark-blue/theme.css'
 
 const container = document.getElementById('root')
 

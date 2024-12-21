@@ -1,13 +1,13 @@
 package password_test
 
 import (
-	"go-pass-react/controlers/password"
+	"go-pass-react/controllers/passwordHelpers"
 	"testing"
 )
 
 func TestEncryptAES(t *testing.T) {
 	pwd := "mysecretpassword"
-	encryptedPassword, err := password.EncryptAES(pwd)
+	encryptedPassword, err := passwordHelpers.EncryptAES(pwd)
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
 	}
@@ -22,12 +22,12 @@ func TestEncryptAES(t *testing.T) {
 
 func TestDecryptAES(t *testing.T) {
 	pwd := "mysecretpassword"
-	encryptedPassword, err := password.EncryptAES(pwd)
+	encryptedPassword, err := passwordHelpers.EncryptAES(pwd)
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
 	}
 
-	decryptedPassword, err := password.DecryptAES(encryptedPassword)
+	decryptedPassword, err := passwordHelpers.DecryptAES(encryptedPassword)
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
 	}

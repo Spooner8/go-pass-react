@@ -13,6 +13,7 @@ type PasswordEntry struct {
 	Password  string `json:"password"`
 	Notes     string `json:"notes"`
 	CreatedAt string `json:"createdAt"`
+	UpdatedAt string `json:"updatedAt"`
 }
 
 func (p *PasswordEntry) newID() {
