@@ -11,31 +11,25 @@ interface Props {
 }
 
 export function PasswortList({ safeProfile }: Props) {
-    const [ profile, setProfile ] = useState<SafeProfile>(safeProfile);
+    const [profile, setProfile] = useState<SafeProfile>(safeProfile);
     const [globalFilter, setGlobalFilter] = useState<string>('');
     const [selectedPassword, setSelectedPassword] =
         useState<PasswordEntry | null>(null);
     const [editing, setEditing] = useState<boolean>(false);
     const [showPassword, setShowPassword] = useState<boolean>(false);
-
-    useEffect(() => {
-        GetProfileFromPath(safeProfile.filepath).then((response) => {
-            setProfile(response);
-        });
-    }, []);
+    const [notificationVisible, setNotificationVisible] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string>('');
 
     useEffect(() => {
         setShowPassword(false);
         setSelectedPassword(prev => {
-            if (prev) {
-                return profile.passwords.find(p => p.id === prev.id) || null;
-            }
-            return null;
+            return prev ? profile.passwords.find(p => p.id === prev.id) || null : null
         });
     }, [editing]);
 
     const handleAddPassword = () => {
-        if (editing && !selectedPassword?.id) return;
+        setErrorMessage('');
+        if (editing && !selectedPassword?.id) return;
         profile.passwords.push({
             id: '',
             title: '',
@@ -50,64 +44,22 @@ export function PasswortList({ safeProfile }: Props) {
         setEditing(true);
     }
 
-
-    const [notificationVisible, setNotificationVisible] = useState(false);
-
     const copyToClipboardMessage = (text: string) => {
+        setErrorMessage('');
         navigator.clipboard.writeText(text).then(() => {
             setNotificationVisible(true);
             setTimeout(() => {
                 setNotificationVisible(false);
             }, 2000);
         }).catch(err => {
-            console.error('Error while "copied to clipboard": ', err);
+            setErrorMessage(`Fehler beim Kopieren: ${err}`);
         });
     };
 
-
-    const handleGeneratePassword = async () => {
-        try {
-            if (!editing) {
-                console.warn("Password can only be generated in edit mode");
-                return;
-            }
-            if (!selectedPassword) {
-                console.warn("No item selected");
-                return;
-            }
-            const newPassword = await GenerateNewPassword();
-            setSelectedPassword({
-                ...selectedPassword,
-                password: newPassword,
-                updatedAt: new Date(),
-            });
-
-        } catch (error) {
-            console.error("Error whil generating:", error);
-        }
-    };
-
-    const cancelEditing = () => {
-        if (!selectedPassword) return;
-
-        const originalPassword = profile.passwords.find((p) => p.id === selectedPassword.id);
-        if (originalPassword) {
-            setSelectedPassword({ ...originalPassword });
-        }
-        setEditing(false);
-    };
-
-
-
-
     const updateSafeProfile = async () => {
-        if (!selectedPassword) {
-            console.warn("No entry selected");
-            return;
-        }
-
+        setErrorMessage('');
         const updatedPasswords = profile.passwords.map((p) =>
-            p.id === selectedPassword.id ? { ...selectedPassword, updatedAt: new Date() } : p
+            p.id === selectedPassword!.id ? { ...selectedPassword, updatedAt: new Date() } as PasswordEntry : p
         );
 
         const updatedProfile = { ...profile, passwords: updatedPasswords };
@@ -133,6 +85,11 @@ export function PasswortList({ safeProfile }: Props) {
 
     return (
         <>
+            {errorMessage && (
+                <div className="alert alert-danger" role="alert">
+                    {errorMessage}
+                </div>
+            )}
             <div className='row mb-2'>
                 <div className='col-md-6'>
                     <div className='input-group'>
@@ -151,7 +108,7 @@ export function PasswortList({ safeProfile }: Props) {
                     </div>
                 </div>
                 <div className='col-md-1'>
-                    <button className='btn btn-primary' onClick={handleAddPassword}>
+                    <button className='btn btn-primary' onClick={handleAddPassword} title='Neues Passwort hinzufügen'>
                         <i className="bi bi-plus-circle"></i>
                     </button>
                 </div>
@@ -198,31 +155,26 @@ export function PasswortList({ safeProfile }: Props) {
                 <div className='col-sm-12'>
                     <div className='card'>
                         <div className='card-header d-flex justify-content-end'>
-                            {editing && (
-                                <>
-                                    <button
-                                        className='btn btn-success me-2 save-entry'
-                                        onClick={updateSafeProfile}
-                                    >
-                                        <i className="bi bi-floppy"></i> Speichern
-                                    </button>
-                                    <button
-                                        className='btn btn-secondary'
-                                        onClick={cancelEditing}
-                                    >
-                                        <i className="bi bi-x-lg"></i> Abbrechen
-                                    </button>
-                                </>
-                            )}
-                            {!editing && (
+                        {editing && (
                                 <button
-                                    className='btn btn-primary'
-                                    onClick={() => setEditing(true)}
-                                    disabled={!selectedPassword}
+                                    className='btn btn-success me-2 save-entry'
+                                    title='Speichern'
+                                    onClick={updateSafeProfile}
                                 >
-                                    <i className="bi bi-pencil-square"></i> Bearbeiten
+                                    <i className="bi bi-floppy"></i>
                                 </button>
                             )}
+                            <button
+                                className='btn btn-primary'
+                                title={editing ? 'Abbrechen' : 'Bearbeiten'}
+                                onClick={() => {
+                                    !selectedPassword?.id && safeProfile.passwords.pop();
+                                    setEditing(!editing)
+                                }}
+                                disabled={!selectedPassword}
+                            >
+                                {editing ? abortBtn : editBtn}
+                            </button>
                         </div>
 
                         <div className='card-body'>
@@ -329,17 +281,20 @@ export function PasswortList({ safeProfile }: Props) {
                                             <span className='input-group-text password-toggle'>
                                                 <i
                                                     className={`bi bi-dice-3`}
-                                                    onClick={handleGeneratePassword}
+                                                    onClick={async () => {
+                                                        if (editing && selectedPassword) {
+                                                            setSelectedPassword({
+                                                                ...selectedPassword,
+                                                                password: await GenerateNewPassword() || selectedPassword?.password || ''
+                                                            } as PasswordEntry);
+                                                        }
+                                                    }}
                                                 ></i>
                                             </span>
                                             <span className='input-group-text password-toggle'>
                                                 <i
                                                     className={`bi bi-clipboard`}
-                                                    onClick={() => {
-                                                        if (selectedPassword) {
-                                                            copyToClipboardMessage(selectedPassword.password);
-                                                        }
-                                                    }}
+                                                    onClick={() => { selectedPassword && copyToClipboardMessage(selectedPassword.password); }}
                                                 ></i>
                                             </span>
                                             <span className='input-group-text password-toggle'>
