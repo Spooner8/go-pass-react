@@ -4,7 +4,7 @@ import { SafeProfile } from '../models/safeProfile';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
-import { UpdateProfile, GetProfileFromPath } from '../../wailsjs/go/main/App';
+import { UpdateProfile, GetProfileFromPath, GenerateNewPassword } from '../../wailsjs/go/main/App';
 
 interface Props {
     safeProfile: SafeProfile;
@@ -48,6 +48,49 @@ export function PasswortList({ safeProfile }: Props) {
         setSelectedPassword(profile.passwords[profile.passwords.length - 1]);
         setEditing(true);
     }
+
+
+    const [notificationVisible, setNotificationVisible] = useState(false);
+
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text).then(() => {
+            setNotificationVisible(true);
+            setTimeout(() => {
+                setNotificationVisible(false);
+            }, 2000);
+        }).catch(err => {
+            console.error('Error while "copied to clipboard": ', err);
+        });
+    };
+
+    const handleGeneratePassword = async () => {
+        try {
+            if (!selectedPassword) {
+                console.warn("Kein Eintrag ausgewählt, Passwort kann nicht aktualisiert werden.");
+                return;
+            }
+
+            const newPassword = await GenerateNewPassword("");
+
+            setSelectedPassword({
+                ...selectedPassword,
+                password: newPassword,
+                updatedAt: new Date(),
+            });
+
+            const updatedPasswords = profile.passwords.map((p) =>
+                p.id === selectedPassword.id ? { ...p, password: newPassword } : p
+            );
+
+            setProfile({ ...profile, passwords: updatedPasswords });
+
+            console.log("Passwort erfolgreich generiert und aktualisiert.");
+        } catch (error) {
+            console.error("Fehler beim Generieren des Passworts:", error);
+        }
+    };
+
+
 
     const updateSafeProfile = async () => {
         const updatedPasswords = profile.passwords.map(p => {
@@ -217,6 +260,14 @@ export function PasswortList({ safeProfile }: Props) {
                                             onChange={(e) => setSelectedPassword({ ...selectedPassword, url: e.target.value } as PasswordEntry)}
                                             readOnly={!editing}
                                         />
+                                        {/* Benachrichtigung anzeigen */}
+                                        {notificationVisible && (
+                                            <div className="notification-container">
+                                                <div className="notification">
+                                                    Passwort kopiert!
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                     <div className='hstack gap-3'>
                                         <label
@@ -237,10 +288,29 @@ export function PasswortList({ safeProfile }: Props) {
                                                 }`}
                                                 id='password'
                                                 value={selectedPassword?.password || ''}
-                                                onChange={(e) => setSelectedPassword({ ...selectedPassword, password: e.target.value } as PasswordEntry)}
+                                                onChange={(e) => setSelectedPassword({
+                                                    ...selectedPassword,
+                                                    password: e.target.value
+                                                } as PasswordEntry)}
                                                 readOnly={!editing}
                                                 required
                                             />
+                                            <span className='input-group-text password-toggle'>
+                                                <i
+                                                    className={`bi bi-arrow-repeat`}
+                                                    onClick={handleGeneratePassword}
+                                                ></i>
+                                            </span>
+                                            <span className='input-group-text password-toggle'>
+                                                <i
+                                                    className={`bi bi-clipboard`}
+                                                    onClick={() => {
+                                                        if (selectedPassword) {
+                                                            copyToClipboard(selectedPassword.password);
+                                                        }
+                                                    }}
+                                                ></i>
+                                            </span>
                                             <span className='input-group-text password-toggle'>
                                                 <i
                                                     className={`bi bi-eye${
@@ -268,7 +338,10 @@ export function PasswortList({ safeProfile }: Props) {
                                         } flex-grow-1`}
                                         id='notes'
                                         value={selectedPassword?.notes || ''}
-                                        onChange={(e) => setSelectedPassword({ ...selectedPassword, notes: e.target.value } as PasswordEntry)}
+                                        onChange={(e) => setSelectedPassword({
+                                            ...selectedPassword,
+                                            notes: e.target.value
+                                        } as PasswordEntry)}
                                         readOnly={!editing}
                                     />
                                 </div>

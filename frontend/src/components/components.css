@@ -31,3 +31,23 @@
     border-radius: 8px;
     min-height: 300px;
 }
+
+.notification-container {
+    display: flex;
+    justify-content: flex-end; /* Rechtsbündig */
+    width: 100%; /* Damit die Benachrichtigung den gesamten verfügbaren Platz einnimmt */
+    margin-bottom: 5px; /* Abstand nach unten, um Platz zwischen der Benachrichtigung und den Icons zu schaffen */
+}
+
+.notification {
+    background: rgba(var(--accent-bg), 0.14); /* Gleicher Hintergrund wie die Karte */
+    color: var(--primary-text); /* Gleiche Textfarbe wie die anderen Elemente */
+    padding: 5px; /* Kleinere Polsterung */
+    border-radius: 8px; /* Gleiche Rundung wie die Karte */
+    border: 1px solid rgba(var(--primary-bg), 1); /* Gleiche Rahmenfarbe wie die Karte */
+    box-shadow: 4px 5px 15px rgba(0, 0, 0, 0.5); /* Kleinere Schatten */
+    transition: opacity 0.5s ease; /* Sanfte Übergänge */
+    z-index: 1000; /* Damit die Benachrichtigung über anderen Elementen angezeigt wird */
+    width: fit-content; /* Breite an den Inhalt anpassen */
+    font-size: 0.8rem; /* Kleinere Schriftgröße */
+}

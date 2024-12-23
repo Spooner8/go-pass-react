@@ -49,6 +49,10 @@ func (a *App) GetProfileFromPath(filePath string) (json.RawMessage, error) {
 	return safeProfile.GetSafeProfileFromPath(filePath)
 }
 
+func (a *App) GenerateNewPassword(pwd string) (string, error) {
+	return passwordHelpers.GeneratePassword()
+}
+
 func (a *App) SelectDir() string {
 	return passSystem.SelectDir()
 }
