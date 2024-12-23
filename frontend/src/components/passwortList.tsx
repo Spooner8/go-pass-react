@@ -35,6 +35,7 @@ export function PasswortList({ safeProfile }: Props) {
     }, [editing]);
 
     const handleAddPassword = () => {
+        if (editing && !selectedPassword?.id) return;
         profile.passwords.push({
             id: '',
             title: '',
