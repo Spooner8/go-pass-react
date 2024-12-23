@@ -34,20 +34,20 @@
 
 .notification-container {
     display: flex;
-    justify-content: flex-end; /* Rechtsbündig */
-    width: 100%; /* Damit die Benachrichtigung den gesamten verfügbaren Platz einnimmt */
-    margin-bottom: 5px; /* Abstand nach unten, um Platz zwischen der Benachrichtigung und den Icons zu schaffen */
+    justify-content: flex-end;
+    width: 100%;
+    margin-bottom: 5px;
 }
 
 .notification {
-    background: rgba(var(--accent-bg), 0.14); /* Gleicher Hintergrund wie die Karte */
-    color: var(--primary-text); /* Gleiche Textfarbe wie die anderen Elemente */
-    padding: 5px; /* Kleinere Polsterung */
-    border-radius: 8px; /* Gleiche Rundung wie die Karte */
-    border: 1px solid rgba(var(--primary-bg), 1); /* Gleiche Rahmenfarbe wie die Karte */
-    box-shadow: 4px 5px 15px rgba(0, 0, 0, 0.5); /* Kleinere Schatten */
-    transition: opacity 0.5s ease; /* Sanfte Übergänge */
-    z-index: 1000; /* Damit die Benachrichtigung über anderen Elementen angezeigt wird */
-    width: fit-content; /* Breite an den Inhalt anpassen */
-    font-size: 0.8rem; /* Kleinere Schriftgröße */
+    background: rgba(var(--accent-bg), 0.14);
+    color: var(--primary-text);
+    padding: 5px;
+    border-radius: 8px;
+    border: 1px solid rgba(var(--primary-bg), 1);
+    box-shadow: 4px 5px 15px rgba(0, 0, 0, 0.5);
+    transition: opacity 0.5s ease;
+    z-index: 1000;
+    width: fit-content;
+    font-size: 0.8rem;
 }

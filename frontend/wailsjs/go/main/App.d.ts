@@ -4,7 +4,7 @@ import {json} from '../models';
 
 export function CreateProfile(arg1:json.RawMessage):Promise<string>;
 
-export function GenerateNewPassword(arg1:string):Promise<string>;
+export function GenerateNewPassword():Promise<string>;
 
 export function GetEnv(arg1:string):Promise<string>;
 

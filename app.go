@@ -49,7 +49,7 @@ func (a *App) GetProfileFromPath(filePath string) (json.RawMessage, error) {
 	return safeProfile.GetSafeProfileFromPath(filePath)
 }
 
-func (a *App) GenerateNewPassword(pwd string) (string, error) {
+func (a *App) GenerateNewPassword() (string, error) {
 	return passwordHelpers.GeneratePassword()
 }
 

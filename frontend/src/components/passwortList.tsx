@@ -52,7 +52,7 @@ export function PasswortList({ safeProfile }: Props) {
 
     const [notificationVisible, setNotificationVisible] = useState(false);
 
-    const copyToClipboard = (text: string) => {
+    const copyToClipboardMessage = (text: string) => {
         navigator.clipboard.writeText(text).then(() => {
             setNotificationVisible(true);
             setTimeout(() => {
@@ -63,15 +63,18 @@ export function PasswortList({ safeProfile }: Props) {
         });
     };
 
+
     const handleGeneratePassword = async () => {
         try {
-            if (!selectedPassword) {
-                console.warn("Kein Eintrag ausgewählt, Passwort kann nicht aktualisiert werden.");
+            if (!editing) {
+                console.warn("Password can only be generated in edit mode");
                 return;
             }
-
-            const newPassword = await GenerateNewPassword("");
-
+            if (!selectedPassword) {
+                console.warn("No item selected");
+                return;
+            }
+            const newPassword = await GenerateNewPassword();
             setSelectedPassword({
                 ...selectedPassword,
                 password: newPassword,
@@ -84,9 +87,9 @@ export function PasswortList({ safeProfile }: Props) {
 
             setProfile({ ...profile, passwords: updatedPasswords });
 
-            console.log("Passwort erfolgreich generiert und aktualisiert.");
+            console.log("Password successful generated");
         } catch (error) {
-            console.error("Fehler beim Generieren des Passworts:", error);
+            console.error("Error whil generating:", error);
         }
     };
 
@@ -260,15 +263,15 @@ export function PasswortList({ safeProfile }: Props) {
                                             onChange={(e) => setSelectedPassword({ ...selectedPassword, url: e.target.value } as PasswordEntry)}
                                             readOnly={!editing}
                                         />
-                                        {/* Benachrichtigung anzeigen */}
-                                        {notificationVisible && (
-                                            <div className="notification-container">
-                                                <div className="notification">
-                                                    Passwort kopiert!
-                                                </div>
-                                            </div>
-                                        )}
                                     </div>
+                                    {/* Benachrichtigung anzeigen */}
+                                    {notificationVisible && (
+                                        <div className="notification-container">
+                                            <div className="notification">
+                                                Passwort kopiert!
+                                            </div>
+                                        </div>
+                                    )}
                                     <div className='hstack gap-3'>
                                         <label
                                             htmlFor='password'
@@ -306,7 +309,7 @@ export function PasswortList({ safeProfile }: Props) {
                                                     className={`bi bi-clipboard`}
                                                     onClick={() => {
                                                         if (selectedPassword) {
-                                                            copyToClipboard(selectedPassword.password);
+                                                            copyToClipboardMessage(selectedPassword.password);
                                                         }
                                                     }}
                                                 ></i>

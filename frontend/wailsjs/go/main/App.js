@@ -6,8 +6,8 @@ export function CreateProfile(arg1) {
   return window['go']['main']['App']['CreateProfile'](arg1);
 }
 
-export function GenerateNewPassword(arg1) {
-  return window['go']['main']['App']['GenerateNewPassword'](arg1);
+export function GenerateNewPassword() {
+  return window['go']['main']['App']['GenerateNewPassword']();
 }
 
 export function GetEnv(arg1) {
