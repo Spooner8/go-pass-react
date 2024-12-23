@@ -35,13 +35,20 @@ func GetSafeProfile() (json.RawMessage, error) {
 		}
 	}()
 
-	jsonData := json.RawMessage{}
-	err = json.NewDecoder(file).Decode(&jsonData)
+	safeProfileStruct := models.SafeProfile{}
+	err = json.NewDecoder(file).Decode(&safeProfileStruct)
 	if err != nil {
 		return nil, fmt.Errorf("error: %s", err.Error())
 	}
 
-	return jsonData, nil
+	for i := range safeProfileStruct.Passwords {
+		decryptedPassword, err := passwordHelpers.DecryptAES(safeProfileStruct.Passwords[i].Password)
+		if err != nil {
+			return nil, fmt.Errorf("error decrypting passwords: %s", err.Error())
+		}
+		safeProfileStruct.Passwords[i].Password = decryptedPassword
+	}
+	return json.Marshal(safeProfileStruct)
 }
 
 func GetSafeProfileFromPath(filePath string) (json.RawMessage, error) {
