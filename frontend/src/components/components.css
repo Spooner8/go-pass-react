@@ -29,25 +29,9 @@
 
 .p-datatable-wrapper {
     border-radius: 8px;
-    min-height: 300px;
+    min-height: 290px;
 }
 
-.notification-container {
-    display: flex;
-    justify-content: flex-end;
-    width: 100%;
-    margin-bottom: 5px;
-}
-
-.notification {
-    background: rgba(var(--accent-bg), 0.14);
-    color: var(--primary-text);
-    padding: 5px;
-    border-radius: 8px;
-    border: 1px solid rgba(var(--primary-bg), 1);
-    box-shadow: 4px 5px 15px rgba(0, 0, 0, 0.5);
-    transition: opacity 0.5s ease;
-    z-index: 1000;
-    width: fit-content;
-    font-size: 0.8rem;
+.progress {
+    height: 0.5rem;
 }
