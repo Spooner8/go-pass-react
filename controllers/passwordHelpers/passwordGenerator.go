@@ -3,8 +3,10 @@ package passwordHelpers
 import (
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/rand"
 	"fmt"
 	"go.tmthrgd.dev/passit"
+	"io"
 	"log"
 	"os"
 )
@@ -24,6 +26,9 @@ func GeneratePassword() (string, error) {
 	}
 
 	initialVector := make([]byte, aes.BlockSize)
+	if _, err := io.ReadFull(rand.Reader, initialVector); err != nil {
+		return "", fmt.Errorf("error generating IV: %v", err)
+	}
 
 	cipherStream := cipher.NewCTR(block, initialVector)
 	streamReader := cipher.StreamReader{S: cipherStream, R: zeroReader{}}
