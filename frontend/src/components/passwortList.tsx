@@ -88,6 +88,23 @@ export function PasswortList({ safeProfile }: Props) {
         setEditing(true);
     };
 
+    const handleRemovePassword = async () => {
+        setErrorMessage('');
+        if (!selectedPassword?.id) return;
+
+        const updatedPasswords = profile.passwords.filter(p => p.id !== selectedPassword?.id);
+        const updatedProfile = { ...profile, passwords: updatedPasswords };
+        setProfile(updatedProfile);
+
+        await UpdateProfile(updatedProfile).then(async () => {
+            await GetProfileFromPath(updatedProfile.filepath).then((response) => {
+                setProfile(response);
+                setEditing(false);
+                setSelectedPassword(null);
+            });
+        });
+    };
+
     const updateSafeProfile = async () => {
         setErrorMessage('');
         const updatedPasswords = profile.passwords.map((p) =>
@@ -105,6 +122,7 @@ export function PasswortList({ safeProfile }: Props) {
             });
         });
     };
+
 
     useEffect(() => {
         GetProfileFromPath(safeProfile.filepath).then((response) => {
@@ -163,11 +181,6 @@ export function PasswortList({ safeProfile }: Props) {
                 onSelectionChange={(e) => {
                     setEditing(false);
                     setSelectedPassword(e.value as PasswordEntry);
-                    if (!selectedPassword?.id && safeProfile.passwords.length > 0) {
-                        setProfile(draft => {
-                            draft.passwords.pop();
-                        });
-                    }
                 }}
                 rows={3}
                 scrollable
@@ -201,8 +214,8 @@ export function PasswortList({ safeProfile }: Props) {
                         <p id='pwdNote' className='form-text text-info'>
                             {(!password || !title) && selectedPassword ? 'Titel und Passwort dürfen nicht leer sein.' : ''}
                         </p>
-                        <div className='justify-content-end'>
-                            {editing && (
+                            <div className=''>
+                                {editing && (
                                 <button
                                 className='btn btn-success me-2 save-entry'
                                 title='Speichern'
@@ -212,11 +225,18 @@ export function PasswortList({ safeProfile }: Props) {
                                         <i className="bi bi-floppy"></i>
                                     </button>
                                 )}
+                                <button className='btn btn-danger me-2' title='Löschen' onClick={handleRemovePassword} style={{ display: selectedPassword?.id && !editing ? 'inline' : 'none' }}>
+                                    <i className="bi bi-trash"></i>
+                                </button>
                                 <button
                                     className='btn btn-primary'
                                     title={editing ? 'Abbrechen' : 'Bearbeiten'}
                                     onClick={() => {
-                                        !selectedPassword?.id && safeProfile.passwords.pop();
+                                        if (!selectedPassword?.id) {
+                                            setProfile(draft => {
+                                                draft.passwords.pop();
+                                            });
+                                        }
                                         setEditing(!editing)
                                     }}
                                     disabled={!selectedPassword}
@@ -224,6 +244,7 @@ export function PasswortList({ safeProfile }: Props) {
                                     {editing ? abortBtn : editBtn}
                                 </button>
                             </div>
+
                         </div>
 
                         <div className='card-body'>
