@@ -1,6 +1,7 @@
 import React, { useState, useEffect, ReactNode } from 'react';
 import { PasswordEntry } from '../models/passwordEntry';
 import { SafeProfile } from '../models/safeProfile';
+import { PwdClipboard } from './pwdClipboard';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
@@ -17,11 +18,44 @@ export function PasswortList({ safeProfile }: Props) {
         useState<PasswordEntry | null>(null);
     const [editing, setEditing] = useState<boolean>(false);
     const [showPassword, setShowPassword] = useState<boolean>(false);
-    const [notificationVisible, setNotificationVisible] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string>('');
+    const [showProgress, setShowProgress] = useState<boolean>(false);
+    const [pwCopyEnabled, setPwCopyEnabled] = useState<boolean>(false);
+
+    useEffect(() => {
+        let ctrlDown = false;
+        const ctrlKey = 'Control';
+        const cmdKey = 'Meta';
+        const cKey = 'c';
+
+        const keydownHandler = (e: KeyboardEvent) => {
+            if (e.key === ctrlKey || e.key === cmdKey) ctrlDown = true;
+            if (ctrlDown && e.key === cKey && selectedPassword?.password) {
+                setShowProgress(true);
+            }
+        };
+
+        const keyupHandler = (e: KeyboardEvent) => {
+            if (e.key === ctrlKey || e.key === cmdKey) ctrlDown = false;
+        };
+
+        document.addEventListener('keydown', keydownHandler);
+        document.addEventListener('keyup', keyupHandler);
+
+        return () => {
+            document.removeEventListener('keydown', keydownHandler);
+            document.removeEventListener('keyup', keyupHandler);
+        };
+    }, [pwCopyEnabled]);
+
+    useEffect(() => {
+        setErrorMessage('');
+        selectedPassword?.password ? setPwCopyEnabled(true) : setPwCopyEnabled(false);
+    }, [selectedPassword]);
 
     useEffect(() => {
         setShowPassword(false);
+        setShowProgress(false);
         setSelectedPassword(prev => {
             return prev ? profile.passwords.find(p => p.id === prev.id) || null : null
         });
@@ -42,18 +76,6 @@ export function PasswortList({ safeProfile }: Props) {
 
         setSelectedPassword(profile.passwords[profile.passwords.length - 1]);
         setEditing(true);
-    }
-
-    const copyToClipboardMessage = (text: string) => {
-        setErrorMessage('');
-        navigator.clipboard.writeText(text).then(() => {
-            setNotificationVisible(true);
-            setTimeout(() => {
-                setNotificationVisible(false);
-            }, 2000);
-        }).catch(err => {
-            setErrorMessage(`Fehler beim Kopieren: ${err}`);
-        });
     };
 
     const updateSafeProfile = async () => {
@@ -73,7 +95,6 @@ export function PasswortList({ safeProfile }: Props) {
             });
         });
     };
-
 
     const dateBodyTemplate = (rowData: PasswordEntry) => {
         const date = rowData.updatedAt && new Date(rowData.updatedAt || '');
@@ -123,9 +144,10 @@ export function PasswortList({ safeProfile }: Props) {
                 dataKey={'id'}
                 selectionMode={'single'}
                 selection={selectedPassword}
-                onSelectionChange={(e) =>
+                onSelectionChange={(e) => {
+                    setEditing(false);
                     setSelectedPassword(e.value as PasswordEntry)
-                }
+                }}
                 rows={3}
                 scrollable
                 scrollHeight='300px'
@@ -244,14 +266,6 @@ export function PasswortList({ safeProfile }: Props) {
                                             readOnly={!editing}
                                         />
                                     </div>
-                                    {/* Benachrichtigung anzeigen */}
-                                    {notificationVisible && (
-                                        <div className="notification-container">
-                                            <div className="notification">
-                                                Passwort kopiert!
-                                            </div>
-                                        </div>
-                                    )}
                                     <div className='hstack gap-3'>
                                         <label
                                             htmlFor='password'
@@ -278,41 +292,49 @@ export function PasswortList({ safeProfile }: Props) {
                                                 readOnly={!editing}
                                                 required
                                             />
-                                            <span className='input-group-text password-toggle'>
+                                            <span className='input-group-text password-toggle'
+                                                onClick={async () => {
+                                                    if (editing && selectedPassword) {
+                                                        setSelectedPassword({
+                                                            ...selectedPassword,
+                                                            password: await GenerateNewPassword() || selectedPassword?.password || ''
+                                                        } as PasswordEntry);
+                                                    }
+                                                }}
+                                            >
                                                 <i
                                                     className={`bi bi-dice-3`}
-                                                    onClick={async () => {
-                                                        if (editing && selectedPassword) {
-                                                            setSelectedPassword({
-                                                                ...selectedPassword,
-                                                                password: await GenerateNewPassword() || selectedPassword?.password || ''
-                                                            } as PasswordEntry);
-                                                        }
-                                                    }}
                                                 ></i>
                                             </span>
-                                            <span className='input-group-text password-toggle'>
+                                            <span className='input-group-text password-toggle'                                            
+                                                onClick={() => { selectedPassword?.password && setShowProgress(true); }}
+                                            >
                                                 <i
                                                     className={`bi bi-clipboard`}
-                                                    onClick={() => { selectedPassword && copyToClipboardMessage(selectedPassword.password); }}
                                                 ></i>
                                             </span>
-                                            <span className='input-group-text password-toggle'>
+                                            <span className='input-group-text password-toggle'                                            
+                                                onClick={() =>
+                                                    setShowPassword(
+                                                        !showPassword
+                                                    )
+                                                }
+                                            >
                                                 <i
                                                     className={`bi bi-eye${
                                                         showPassword
                                                             ? ''
                                                             : '-slash'
                                                     }`}
-                                                    onClick={() =>
-                                                        setShowPassword(
-                                                            !showPassword
-                                                        )
-                                                    }
                                                 ></i>
                                             </span>
                                         </div>
                                     </div>
+                                    {showProgress && (
+                                        <div className='col-sm-12 col-md-8 ps-md-3 ms-auto'>
+                                            <PwdClipboard pwd={selectedPassword?.password || ''} show={setShowProgress}/>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className='col-sm-12 col-md-6 d-flex flex-column'>
                                     <label htmlFor='notes' className='col-sm-4'>
