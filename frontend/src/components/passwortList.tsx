@@ -54,6 +54,7 @@ export function PasswortList({ safeProfile }: Props) {
 
     useEffect(() => {
         setErrorMessage('');
+        setShowProgress(false);
         selectedPassword?.password ? setPwCopyEnabled(true) : setPwCopyEnabled(false);
         setTitle(selectedPassword?.title || '');
         setPassword(selectedPassword?.password || '');
