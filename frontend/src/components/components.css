@@ -35,3 +35,7 @@
 .progress {
     height: 0.5rem;
 }
+
+.is-invalid {
+    border-color: var(--danger);
+}

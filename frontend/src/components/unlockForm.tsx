@@ -8,6 +8,10 @@ import {
     GetProfile,
     VerifyPassword,
 } from '../../wailsjs/go/main/App';
+import * as REGEX from '../utils/regex';
+
+const PASSWORD_REGEX: RegExp = REGEX.PASSWORD;
+const SAFE_NAME_REGEX: RegExp = REGEX.SAFE_NAME;
 
 export function UnlockForm() {
     const [safeProfile, setSafeProfile] = useImmer<SafeProfile>(
@@ -22,9 +26,12 @@ export function UnlockForm() {
     const [newMasterPassword, setNewMasterPassword] = useImmer<string>('');
     const [confirmNewMasterPassword, setConfirmNewMasterPassword] =
         useImmer<string>('');
-    const [validateNewMasterPassword, setValidateNewMasterPassword] =
+    const [compareNewMasterPassword, setCompareNewMasterPassword] =
         useImmer<boolean>(false);
     const [errorMessage, setErrorMessage] = useImmer<string>('');
+    const [validateNewMasterPassword, setValidateNewMasterPassword] = useImmer<boolean>(false);
+
+    const [validateSafeName, setValidateSafeName] = useImmer<boolean>(false);
 
     const navigate = useNavigate();
 
@@ -40,11 +47,28 @@ export function UnlockForm() {
 
     useEffect(() => {
         if (newMasterPassword !== confirmNewMasterPassword) {
-            setValidateNewMasterPassword(false);
+            setCompareNewMasterPassword(false);
         } else {
-            setValidateNewMasterPassword(true);
+            setCompareNewMasterPassword(true);
         }
     }, [newMasterPassword, confirmNewMasterPassword]);
+
+    useEffect(() => {
+        if (PASSWORD_REGEX.test(newMasterPassword)) {
+            setValidateNewMasterPassword(true);
+        } else {
+            setValidateNewMasterPassword(false);
+        }
+    },[newMasterPassword]);
+
+    useEffect(() => {
+        if (SAFE_NAME_REGEX.test(newSafeName)) {
+            setValidateSafeName(true);
+        } else {
+            setValidateSafeName(false);
+            console.log('Invalid safe name');
+        }
+    }, [newSafeName]);
 
     const handleCreateNewSafe = async (
         event: React.MouseEvent<HTMLButtonElement>
@@ -64,7 +88,7 @@ export function UnlockForm() {
                 setCreateNew(false);
                 setConfirmNewMasterPassword('');
                 setNewMasterPassword('');
-                setValidateNewMasterPassword(false);
+                setCompareNewMasterPassword(false);
             });
         } catch (error: any) {
             setErrorMessage('Error creating safe');
@@ -165,10 +189,13 @@ export function UnlockForm() {
                                             onChange={(e) =>
                                                 setNewSafeName(e.target.value)
                                             }
-                                            className='form-control mb-4'
+                                            className={`form-control ${!newSafeName || !validateSafeName ? 'is-invalid' : ''}`}
                                             placeholder='Tresorname'
                                         />
-                                        <div className='input-group mb-4'>
+                                        <small className='text-info'>
+                                            {!validateSafeName && '2-50 Zeichen | Erlaubt: a-z, A-Z, 0-9, (Leerzeichen, _-.)'}
+                                        </small>
+                                        <div className='input-group mt-3'>
                                             <button
                                                 className='btn btn-primary'
                                                 type='button'
@@ -182,7 +209,7 @@ export function UnlockForm() {
                                                 id='newPath'
                                                 aria-describedby='btn-chooseFolder'
                                                 aria-label='Speicherort'
-                                                className='form-control'
+                                                className={`form-control ${!newSafePath ? 'is-invalid' : ''}`}
                                                 placeholder='Speicherort'
                                                 readOnly
                                                 value={newSafePath}
@@ -197,8 +224,11 @@ export function UnlockForm() {
                                                     e.target.value
                                                 )
                                             }
-                                            className='form-control mb-4'
+                                            className={`form-control mt-3 ${!newMasterPassword || !validateNewMasterPassword ? 'is-invalid' : ''}`}
                                         />
+                                        <small className='text-info mt-1'>
+                                            {!validateNewMasterPassword && 'Min. 8 Zeichen und min. einen Großbuchstaben, eine Zahl und ein Sonderzeichen'}
+                                        </small>
                                         <input
                                             type='password'
                                             id='confirmNewPassword'
@@ -208,11 +238,11 @@ export function UnlockForm() {
                                                     e.target.value
                                                 )
                                             }
-                                            className='form-control'
+                                            className={`form-control mt-3 ${!confirmNewMasterPassword || !compareNewMasterPassword ? 'is-invalid' : ''}`}
                                         />
-                                        {!validateNewMasterPassword && (
+                                        {!compareNewMasterPassword && (
                                             <div className='row'>
-                                                <small className='text-danger col-sm-12'>
+                                                <small className='text-info col-sm-12'>
                                                     Passwörter stimmen nicht
                                                     überein
                                                 </small>
@@ -226,6 +256,8 @@ export function UnlockForm() {
                                                 !newSafePath ||
                                                 !newMasterPassword ||
                                                 !confirmNewMasterPassword ||
+                                                !compareNewMasterPassword ||
+                                                !validateSafeName ||
                                                 !validateNewMasterPassword
                                             }
                                             onClick={handleCreateNewSafe}
