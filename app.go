@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"go-pass-react/controllers/passSystem"
 	"go-pass-react/controllers/passwordHelpers"
 	"go-pass-react/controllers/safeProfile"
 	"os"
+	"github.com/atotto/clipboard"
 )
 
 // App struct
@@ -59,4 +61,12 @@ func (a *App) SelectDir() string {
 
 func (a *App) VerifyPassword(hashedPassword, password string) bool {
 	return passwordHelpers.VerifyPassword(hashedPassword, password)
+}
+
+func (a *App) AddToClipboard(password string) (error) {
+	err := clipboard.WriteAll(password)
+	if err != nil {
+		return fmt.Errorf("error copying password to clipboard: %v", err)
+	}
+	return nil
 }
