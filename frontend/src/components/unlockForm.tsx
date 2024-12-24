@@ -193,7 +193,7 @@ export function UnlockForm() {
                                             placeholder='Tresorname'
                                         />
                                         <small className='text-info'>
-                                            {!validateSafeName && '2-50 Zeichen | Erlaubt: a-z, A-Z, 0-9, (Leerzeichen, _-.)'}
+                                            {!validateSafeName && '2-50 Zeichen | Erlaubt: a-z, A-Z, 0-9, Leerzeichen _ - .'}
                                         </small>
                                         <div className='input-group mt-3'>
                                             <button
@@ -218,7 +218,7 @@ export function UnlockForm() {
                                         <input
                                             type='password'
                                             id='newPassword'
-                                            placeholder='Neuws Passwort'
+                                            placeholder='Neues Passwort'
                                             onChange={(e) =>
                                                 setNewMasterPassword(
                                                     e.target.value
