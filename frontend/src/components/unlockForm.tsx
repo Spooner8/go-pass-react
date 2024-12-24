@@ -92,18 +92,22 @@ export function UnlockForm() {
         <>
             <div className='card'>
                 <div className='card-body'>
-                    <h5 className='card-title'>GoPass Tresor entsperren</h5>
-                    {<small className='card-text'>{safePath}</small>}
-                    <input
-                        className='form-control mb-4'
-                        id='password'
-                        type='password'
-                        placeholder='Masterpasswort'
-                        aria-label='Masterpasswort'
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        disabled={!safePath}
-                    />
+                    {!createNew && (
+                        <>
+                            <h5 className='card-title'>GoPass Tresor entsperren</h5>
+                            <small className='card-text'>{safePath}</small>
+                            <input
+                                className='form-control mb-4'
+                                id='password'
+                                type='password'
+                                placeholder='Masterpasswort'
+                                aria-label='Masterpasswort'
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                disabled={!safePath}
+                            />
+                        </>
+                    )}
                     {safePath ? (
                         <div className='row'>
                             <div className='col-sm-12 col-md-6'>
@@ -131,7 +135,7 @@ export function UnlockForm() {
                     ) : (
                         <>
                             <div className='row'>
-                                <div className='col-sm-12 col-md-6'>
+                                <div className='col-sm-12 col-md-6 mb-2'>
                                     <button
                                         className='btn btn-primary w-100'
                                         id='btn-new'
@@ -143,7 +147,7 @@ export function UnlockForm() {
                                         Neuer Tresor
                                     </button>
                                 </div>
-                                <div className='col-sm-12 col-md-6'>
+                                <div className='col-sm-12 col-md-6 mb-2'>
                                     <button
                                         className='btn btn-primary w-100'
                                         id='btn-open'
