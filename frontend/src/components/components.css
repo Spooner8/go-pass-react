@@ -29,5 +29,9 @@
 
 .p-datatable-wrapper {
     border-radius: 8px;
-    min-height: 300px;
+    min-height: 290px;
+}
+
+.progress {
+    height: 0.5rem;
 }
