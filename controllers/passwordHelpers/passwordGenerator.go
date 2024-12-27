@@ -33,7 +33,7 @@ func GeneratePassword() (string, error) {
 	cipherStream := cipher.NewCTR(block, initialVector)
 	streamReader := cipher.StreamReader{S: cipherStream, R: zeroReader{}}
 
-	pwd, err := passit.Repeat(passit.EFFLargeWordlist, "-", 6).Password(streamReader)
+	pwd, err := passit.Repeat(passit.EFFLargeWordlist, "-", 8).Password(streamReader)
 	if err != nil {
 		log.Fatal("error while generating password_test", err)
 		return "", err
