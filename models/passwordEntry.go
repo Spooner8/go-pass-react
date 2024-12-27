@@ -1,10 +1,7 @@
 package models
 
-import (
-	"fmt"
-	"github.com/google/uuid"
-)
-
+// PasswordEntry is the struct for a single password entry
+// It is part of the SafeProfile struct
 type PasswordEntry struct {
 	Id        string `json:"id"`
 	Title     string `json:"title"`
@@ -16,15 +13,3 @@ type PasswordEntry struct {
 	UpdatedAt string `json:"updatedAt"`
 }
 
-func (p *PasswordEntry) newID() {
-	id := uuid.New()
-	p.Id = id.String()
-}
-
-func (p *PasswordEntry) Save() {
-	if p.Id == "" {
-		p.newID()
-	}
-	// TODO implement saving to file
-	fmt.Println("Passwort wurde gespeichert")
-}

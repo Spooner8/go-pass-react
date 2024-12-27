@@ -1,3 +1,4 @@
+// Package password_test provides some tests for the passwordHelpers package
 package password_test
 
 import (
@@ -5,6 +6,7 @@ import (
 	"testing"
 )
 
+// TestHashPassword tests the HashPassword function basic functionality
 func TestEncryptAES(t *testing.T) {
 	pwd := "mysecretpassword"
 	encryptedPassword, err := passwordHelpers.EncryptAES(pwd)
@@ -20,6 +22,7 @@ func TestEncryptAES(t *testing.T) {
 	t.Logf("Encrypted password: %s", encryptedPassword)
 }
 
+// TestDecryptAES tests the DecryptAES function basic functionality by encrypting a password and then decrypting it
 func TestDecryptAES(t *testing.T) {
 	pwd := "mysecretpassword"
 	encryptedPassword, err := passwordHelpers.EncryptAES(pwd)

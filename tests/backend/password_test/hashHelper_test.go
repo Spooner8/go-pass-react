@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+// TestHashPassword tests the HashPassword function basic functionality by hashing a password and checking if the hashed password is not empty
 func TestHashPassword(t *testing.T) {
 	pwd := "mysecretpassword"
 	hashedPassword, err := passwordHelpers.HashPassword(pwd)
@@ -19,6 +20,7 @@ func TestHashPassword(t *testing.T) {
 	t.Logf("Hashed password: %s", hashedPassword)
 }
 
+// TestVerifyPassword tests the VerifyPassword function basic functionality by hashing a password and then verifying it
 func TestVerifyPassword(t *testing.T) {
 	pwd := "mysecretpassword"
 	hashedPassword, err := passwordHelpers.HashPassword(pwd)

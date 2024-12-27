@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+// TestGeneratePassword tests the GeneratePassword function by generating a password and checking if it is not empty
 func TestGeneratePassword(t *testing.T) {
 	pwd, err := passwordHelpers.GeneratePassword()
 	if err != nil {

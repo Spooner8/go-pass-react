@@ -1,3 +1,4 @@
+// Package models provides the struct for the safeProfile and some functions to interact with it
 package models
 
 import (
@@ -9,6 +10,8 @@ import (
 	"github.com/google/uuid"
 )
 
+// SafeProfile is the struct for the safeProfile
+// It contains the Passwords as a slice of PasswordEntry
 type SafeProfile struct {
 	Id             string          `json:"id"`
 	Name           string          `json:"name"`
@@ -19,6 +22,8 @@ type SafeProfile struct {
 	UpdatedAt      string          `json:"updatedAt"`
 }
 
+// Create creates a new safeProfile by marshaling the struct to json and writing it to a file
+// On creation the masterpassword will be hashed with bcrypt and the id will be generated
 func (p *SafeProfile) Create() string {
 	p.Id = generateNewID()
 	hashedPassword, err := passwordHelpers.HashPassword(p.Masterpassword)
@@ -49,6 +54,8 @@ func (p *SafeProfile) Create() string {
 	return "created"
 }
 
+// Update updates the safeProfile by marshaling the struct to json and writing it to a file
+// It also checks if the PasswordEntries have an id and generates one if not
 func (p *SafeProfile) Update() string {
     checkNewEntries(&p.Passwords)
 
@@ -71,6 +78,7 @@ func (p *SafeProfile) Update() string {
     return "updated"
 }
 
+// checkNewEntries checks if the PasswordEntries have an id and generates one if not
 func checkNewEntries(entries *[]PasswordEntry) {
 	for i := range *entries {
 		if (*entries)[i].Id == "" {
@@ -79,6 +87,7 @@ func checkNewEntries(entries *[]PasswordEntry) {
 	}
 }
 
+// generateNewID generates a new id with the uuid package
 func generateNewID() string {
 	return uuid.New().String()
 }

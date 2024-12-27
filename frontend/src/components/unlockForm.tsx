@@ -13,7 +13,15 @@ import * as REGEX from '../utils/regex';
 const PASSWORD_REGEX: RegExp = REGEX.PASSWORD;
 const SAFE_NAME_REGEX: RegExp = REGEX.SAFE_NAME;
 
-export function UnlockForm() {
+/**
+ * @author Spooner8 and SyntayWizardBB - 2024
+ * 
+ * @description 
+ * This component is responsible for unlocking the safe and/or creating a new safe.
+ * 
+ * @returns {JSX.Element}
+ */
+export function UnlockForm(): JSX.Element {
     const [safeProfile, setSafeProfile] = useImmer<SafeProfile>(
         {} as SafeProfile
     );
@@ -34,10 +42,6 @@ export function UnlockForm() {
     const [validateSafeName, setValidateSafeName] = useImmer<boolean>(false);
 
     const navigate = useNavigate();
-
-    useEffect(() => {
-        safePath ? console.log(safePath) : console.log('No safe path found');
-    }, []);
 
     const handleUnlock = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();

@@ -1,3 +1,4 @@
+// Package safeProfile provides some function to interact from Frontend to Backend for safeProfile operations
 package safeProfile
 
 import (
@@ -9,6 +10,8 @@ import (
 	"os"
 )
 
+// CreateSafeProfile prooves if the given safeProfile is valid to the model and creates it
+// It returns a string with the result of the operation
 func CreateSafeProfile(safeProfile json.RawMessage) string {
 	safeProfileStruct := models.SafeProfile{}
 	err := json.Unmarshal(safeProfile, &safeProfileStruct)
@@ -19,6 +22,8 @@ func CreateSafeProfile(safeProfile json.RawMessage) string {
 	return safeProfileStruct.Create()
 }
 
+// GetSafeProfile opens a dialog to select a filepath
+// It returns the safeProfile as json or an error
 func GetSafeProfile() (json.RawMessage, error) {
 	filePath := passSystem.SelectFile()
 	if filePath == "" {
@@ -51,6 +56,8 @@ func GetSafeProfile() (json.RawMessage, error) {
 	return json.Marshal(safeProfileStruct)
 }
 
+// GetSafeProfileFromPath gets the safeProfile from a given filepath
+// It returns the safeProfile as json or an error
 func GetSafeProfileFromPath(filePath string) (json.RawMessage, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -78,6 +85,8 @@ func GetSafeProfileFromPath(filePath string) (json.RawMessage, error) {
 	return json.Marshal(safeProfileStruct)
 }
 
+// UpdateSafeProfile prooves if the given safeProfile is valid to the model and updates it
+// It returns a string with the result of the operation
 func UpdateSafeProfile(safeProfile json.RawMessage) string {
 	safeProfileStruct := models.SafeProfile{}
 	err := json.Unmarshal(safeProfile, &safeProfileStruct)

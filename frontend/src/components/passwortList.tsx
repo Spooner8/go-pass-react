@@ -12,7 +12,24 @@ interface Props {
     safeProfile: SafeProfile;
 }
 
-export function PasswortList({ safeProfile }: Props) {
+/**
+ * @author Spooner8 and SyntaxWizardBB - 2024
+ * 
+ * @description
+ * This component is responsible for rendering the password list and the password details.
+ * It contains the following features:
+ * - Add new password
+ * - Remove password
+ * - Edit password
+ * - Save password
+ * - Copy password to clipboard
+ * - Show password
+ * - Generate new password * 
+ * 
+ * @param {Props} { safeProfile } - The safe profile given from unlocking the safe. 
+ * @returns {JSX.Element} - A JSX Element containing the password list and the password details.
+ */
+export function PasswortList({ safeProfile }: Props): JSX.Element {
     const [profile, setProfile] = useImmer<SafeProfile>(safeProfile);
     const [globalFilter, setGlobalFilter] = useImmer<string>('');
     const [selectedPassword, setSelectedPassword] =
