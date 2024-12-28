@@ -20,11 +20,12 @@
     border-width: 0;
 }
 
-.password-toggle {
+.password-extras {
     background: rgba(var(--accent-bg), 0.14);
     color: var(--primary-text);
     border-width: 0;
     cursor: pointer;
+    border-radius: var(--bs-border-radius);
 }
 
 .p-datatable-wrapper {
@@ -37,5 +38,54 @@
 }
 
 .is-invalid {
-    border-color: var(--danger);
+    border-color: var(--bs-form-invalid-border-color);
+}
+
+.p-invalid {
+    border-color: var(--bs-form-invalid-border-color);
+}
+
+.p-password {
+    display: block;
+}
+
+.p-password-input {
+    background: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    width: 100%;
+    border-radius: var(--bs-border-radius);;
+}
+
+.p-password-input:read-only {
+    background: rgba(var(--accent-bg), 0.14);
+    color: var(--primary-text);
+}
+
+.p-password-input:read-only::placeholder {
+    color: var(--primary-text);
+}
+
+.p-password-input:read-only + .p-input-icon {
+    color: var(--primary-text);
+}
+
+.p-password-input::placeholder {
+    color: var(--bs-body-color);
+}
+
+.p-input-icon {
+    padding-right: 2rem;
+    color: var(--bs-body-color);
+}
+
+.p-password-show-icon {
+    vertical-align: super;
+}
+
+.p-password-hide-icon {
+    vertical-align: super;
+}
+
+.password-input .p-input-icon {
+    padding-right: 0rem;
 }

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { SafeProfile } from '../models/safeProfile';
 import { useNavigate } from 'react-router-dom';
 import { useImmer } from 'use-immer';
@@ -9,6 +9,8 @@ import {
     VerifyPassword,
 } from '../../wailsjs/go/main/App';
 import * as REGEX from '../utils/regex';
+import { Password } from 'primereact/password';
+import { Divider } from 'primereact/divider';
 
 const PASSWORD_REGEX: RegExp = REGEX.PASSWORD;
 const SAFE_NAME_REGEX: RegExp = REGEX.SAFE_NAME;
@@ -49,6 +51,35 @@ export function UnlockForm(): JSX.Element {
         response ? navigate('/mainpage', { state: safeProfile }) : setErrorMessage('Wrong password');
     };
 
+    const pw8Chars: Boolean = newMasterPassword.length >= 8 ? true : false;
+    const pwUpper: Boolean = /[A-Z]/.test(newMasterPassword) ? true : false;
+    const pwNumber: Boolean = /[0-9]/.test(newMasterPassword) ? true : false;
+    const pwSpecial: Boolean = /[(){}\[\]\\?~<>+!@#$%^&*._\-\/]/.test(newMasterPassword) ? true : false;
+
+    const pwSuccess = <i className="bi bi-check2-circle text-success"></i>;
+    const pwFail = <i className="bi bi-x-circle text-danger"></i>;
+
+    const pwFooter = (
+        <>
+            <Divider/>
+            <p className="mt-2">Vorgaben</p>
+            <ul className="pl-2 ml-2 mt-0 line-height-3">
+            <li style={{ listStyleType: 'none' }}>
+                {pw8Chars ? pwSuccess : pwFail} 8 Zeichen
+            </li>
+            <li style={{ listStyleType: 'none' }}>
+                {pwUpper ? pwSuccess : pwFail} Ein Grossbuchstabe
+            </li>
+            <li style={{ listStyleType: 'none' }}>
+                {pwNumber ? pwSuccess : pwFail} Eine Zahl
+            </li>
+            <li style={{ listStyleType: 'none' }}>
+                {pwSpecial ? pwSuccess : pwFail} Ein Sonderzeichen
+            </li>
+        </ul>
+        </>
+    )
+
     useEffect(() => {
         if (newMasterPassword !== confirmNewMasterPassword) {
             setCompareNewMasterPassword(false);
@@ -70,7 +101,6 @@ export function UnlockForm(): JSX.Element {
             setValidateSafeName(true);
         } else {
             setValidateSafeName(false);
-            console.log('Invalid safe name');
         }
     }, [newSafeName]);
 
@@ -124,14 +154,15 @@ export function UnlockForm(): JSX.Element {
                         <>
                             <h5 className='card-title'>GoPass Tresor entsperren</h5>
                             <small className='card-text'>{safePath}</small>
-                            <input
-                                className='form-control mb-4'
+                            <Password
+                                className='mb-4'
                                 id='password'
-                                type='password'
                                 placeholder='Masterpasswort'
                                 aria-label='Masterpasswort'
+                                value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
+                                feedback={false}
                                 disabled={!safePath}
                             />
                         </>
@@ -223,31 +254,25 @@ export function UnlockForm(): JSX.Element {
                                                 value={newSafePath}
                                             />
                                         </div>
-                                        <input
-                                            type='password'
-                                            id='newPassword'
-                                            placeholder='Neues Passwort'
-                                            onChange={(e) =>
-                                                setNewMasterPassword(
-                                                    e.target.value
-                                                )
-                                            }
-                                            className={`form-control mt-3 ${!newMasterPassword || !validateNewMasterPassword ? 'is-invalid' : ''}`}
-                                        />
-                                        <small className='text-info mt-1'>
-                                            {!validateNewMasterPassword && 'Min. 8 Zeichen und min. einen Großbuchstaben, eine Zahl und ein Sonderzeichen'}
-                                        </small>
-                                        <input
-                                            type='password'
-                                            id='confirmNewPassword'
-                                            placeholder='Neues Passwort bestätigen'
-                                            onChange={(e) =>
-                                                setConfirmNewMasterPassword(
-                                                    e.target.value
-                                                )
-                                            }
-                                            className={`form-control mt-3 ${!confirmNewMasterPassword || !compareNewMasterPassword ? 'is-invalid' : ''}`}
-                                        />
+                                        <div className='mt-3'>
+                                            <Password id='newPassword'
+                                                    placeholder='Neues Passwort'
+                                                    value={newMasterPassword}
+                                                    onChange={(e) => setNewMasterPassword(e.target.value)}
+                                                    toggleMask
+                                                    footer={pwFooter}
+                                                    invalid={!newMasterPassword || !validateNewMasterPassword}
+                                                    promptLabel="Passwort eingeben" weakLabel="Zu schach" mediumLabel="Fast gut" strongLabel="Stark"/>
+                                        </div>
+                                        <div className='mt-3'>
+                                            <Password id='confirmNewPassword'
+                                                    placeholder='Neues Passwort bestätigen'
+                                                    value={confirmNewMasterPassword}
+                                                    onChange={(e) => setConfirmNewMasterPassword(e.target.value)}
+                                                    toggleMask
+                                                    feedback={false}
+                                                    invalid={!confirmNewMasterPassword || !compareNewMasterPassword}/>
+                                        </div>
                                         {!compareNewMasterPassword && (
                                             <div className='row'>
                                                 <small className='text-info col-sm-12'>

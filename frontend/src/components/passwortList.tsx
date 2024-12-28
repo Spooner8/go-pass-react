@@ -7,6 +7,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
 import { UpdateProfile, GetProfileFromPath, GenerateNewPassword } from '../../wailsjs/go/main/App';
+import { Password } from 'primereact/password';
 
 interface Props {
     safeProfile: SafeProfile;
@@ -346,31 +347,24 @@ export function PasswortList({ safeProfile }: Props): JSX.Element {
                                         >
                                             Passwort
                                         </label>
-                                        <div className='input-group'>
-                                            <input
-                                                type={`${
-                                                    showPassword
-                                                        ? 'text'
-                                                        : 'password'
-                                                }`}
-                                                className={`form-control ${
-                                                    !editing ? 'editDetail' : ''
-                                                } ${!password && selectedPassword ? 'is-invalid' : ''}`}
-                                                id='password'
-                                                value={selectedPassword?.password || ''}
-                                                onChange={(e) =>
-                                                    {
-                                                        setSelectedPassword({
-                                                            ...selectedPassword,
-                                                            password: e.target.value
-                                                        } as PasswordEntry)
-                                                        setPassword(e.target.value);
-                                                    }
-                                                }   
-                                                readOnly={!editing}
-                                                required
-                                            />
-                                            <span className='input-group-text password-toggle'
+                                        <div className='d-flex w-100 password-input'>
+                                            <Password id='newPassword'
+                                                        value={selectedPassword?.password || ''}
+                                                        className='password-field flex-grow-1 me-1'
+                                                        onChange={(e) =>
+                                                            {
+                                                                setSelectedPassword({
+                                                                    ...selectedPassword,
+                                                                    password: e.target.value
+                                                                } as PasswordEntry)
+                                                                setPassword(e.target.value);
+                                                            }
+                                                        } 
+                                                        toggleMask
+                                                        feedback={false}
+                                                        readOnly={!editing}
+                                                        invalid={!password && !!selectedPassword}/>
+                                            <span className='input-group-text password-extras me-1'
                                                 onClick={async () =>
                                                     {
                                                         if (editing && selectedPassword) {
@@ -388,26 +382,12 @@ export function PasswortList({ safeProfile }: Props): JSX.Element {
                                                     className={`bi bi-dice-3`}
                                                 ></i>
                                             </span>
-                                            <span className='input-group-text password-toggle'                                            
+                                            <span className='input-group-text password-extras' 
+                                            title='In die Zwischenablage kopieren'                                           
                                                 onClick={() => { selectedPassword?.password && setShowProgress(true); }}
                                             >
                                                 <i
                                                     className={`bi bi-clipboard`}
-                                                ></i>
-                                            </span>
-                                            <span className='input-group-text password-toggle'                                            
-                                                onClick={() =>
-                                                    setShowPassword(
-                                                        !showPassword
-                                                    )
-                                                }
-                                            >
-                                                <i
-                                                    className={`bi bi-eye${
-                                                        showPassword
-                                                            ? ''
-                                                            : '-slash'
-                                                    }`}
                                                 ></i>
                                             </span>
                                         </div>
