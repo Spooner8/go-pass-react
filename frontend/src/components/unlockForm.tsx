@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from 'react';
+import { useEffect } from 'react';
 import { SafeProfile } from '../models/safeProfile';
 import { useNavigate } from 'react-router-dom';
 import { useImmer } from 'use-immer';
@@ -154,17 +154,20 @@ export function UnlockForm(): JSX.Element {
                         <>
                             <h5 className='card-title'>GoPass Tresor entsperren</h5>
                             <small className='card-text'>{safePath}</small>
-                            <Password
-                                className='mb-4'
-                                id='password'
-                                placeholder='Masterpasswort'
-                                aria-label='Masterpasswort'
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                feedback={false}
-                                disabled={!safePath}
-                            />
+                            <div className='mt-3 '>
+                                <Password
+                                    className='mb-4 password-field'
+                                    id='password'
+                                    placeholder='Masterpasswort'
+                                    aria-label='Masterpasswort'
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                    toggleMask
+                                    feedback={false}
+                                    disabled={!safePath}
+                                    />
+                            </div>
                         </>
                     )}
                     {safePath ? (
