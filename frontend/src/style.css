@@ -4,6 +4,8 @@
     --primary-text: 255, 255, 255;
     --error-text: 255, 0, 0;
     --success-text: 0, 255, 0;
+
+    --btn-primary: #0d6efd;
 }
 
 body {

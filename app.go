@@ -10,6 +10,7 @@ import (
 	"go-pass-react/controllers/passwordHelpers"
 	"go-pass-react/controllers/safeProfile"
 	"os"
+
 	"github.com/atotto/clipboard"
 )
 
@@ -50,6 +51,11 @@ func (a *App) UpdateProfile(profile json.RawMessage) string {
 	return safeProfile.UpdateSafeProfile(profile)
 }
 
+func (a *App) UpdateMasterPassword(password string) (string, error) {
+	newPasswordHash, err := passwordHelpers.HashPassword(password)
+	return newPasswordHash, err
+}
+
 // GetProfile opens a dialog to select a filepath
 // It returns the profile as json or an error
 func (a *App) GetProfile() (json.RawMessage, error) {
@@ -83,7 +89,7 @@ func (a *App) VerifyPassword(hashedPassword, password string) bool {
 // AddToClipboard adds a password to the clipboard for a predefined time
 // It returns an error if the password could not be copied to the clipboard
 // or nil if the operation was successful
-func (a *App) AddToClipboard(password string) (error) {
+func (a *App) AddToClipboard(password string) error {
 	err := clipboard.WriteAll(password)
 	if err != nil {
 		return fmt.Errorf("error copying password to clipboard: %v", err)

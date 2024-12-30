@@ -152,7 +152,10 @@ export function UnlockForm(): JSX.Element {
                 <div className='card-body'>
                     {!createNew && (
                         <>
+                        <div className='d-flex justify-content-between align-items-top'>
                             <h5 className='card-title'>GoPass Tresor entsperren</h5>
+                            {safePath && <button title='Tresor schliessen' className='close' onClick={() => { setSafePath('')}} aria-label='Close'><i className="bi bi-x-lg settings-icon"></i></button>}
+                        </div>
                             <small className='card-text'>{safePath}</small>
                             <div className='mt-3 '>
                                 <Password

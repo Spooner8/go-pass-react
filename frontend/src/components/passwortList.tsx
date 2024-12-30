@@ -36,7 +36,6 @@ export function PasswortList({ safeProfile }: Props): JSX.Element {
     const [selectedPassword, setSelectedPassword] =
     useImmer<PasswordEntry | null>(null);
     const [editing, setEditing] = useImmer<boolean>(false);
-    const [showPassword, setShowPassword] = useImmer<boolean>(false);
     const [errorMessage, setErrorMessage] = useImmer<string>('');
     const [showProgress, setShowProgress] = useImmer<boolean>(false);
     const [pwCopyEnabled, setPwCopyEnabled] = useImmer<boolean>(false);
@@ -79,7 +78,6 @@ export function PasswortList({ safeProfile }: Props): JSX.Element {
     }, [selectedPassword]);
 
     useEffect(() => {
-        setShowPassword(false);
         setShowProgress(false);
         setSelectedPassword(prev => {
             return prev ? profile.passwords.find(p => p.id === prev.id) || null : null

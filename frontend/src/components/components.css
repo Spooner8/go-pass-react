@@ -1,3 +1,5 @@
+
+
 .card {
     background: rgba(var(--accent-bg), 0.14);
     border-radius: 8px;
@@ -88,4 +90,28 @@
 
 .password-input .p-input-icon {
     padding-right: 0rem;
+}
+
+.settings, .close {
+    background-color: transparent;
+    color: var(--btn-primary);
+    border: none;
+    scale: 1.5;
+}
+
+.settings:hover, .close:hover {
+    color: var(--btn-primary);
+    background-color: transparent;
+    filter: drop-shadow(0px 0px 10px white);
+}
+
+.settings:active, .close:active {
+    color: white;
+    background-color: transparent;
+    filter: drop-shadow(0px 0px 10px white);
+}
+
+.change-password-form {
+    max-width: 400px;
+    margin: 0 auto;
 }
