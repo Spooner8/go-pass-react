@@ -1,9 +1,9 @@
 import { PasswortList } from "../components/passwortList";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { SafeProfile } from "../models/safeProfile";
 import { useImmer } from "use-immer";
 import { ChangeMasterPassword } from "../components/changeMasterpassword";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 
 /**
  * @author Spooner8 and SyntaxWizardBB - 2024
@@ -16,6 +16,7 @@ import { ReactNode } from "react";
 export function MainPage(): JSX.Element {
   const location = useLocation();
   const safeProfile = location.state as SafeProfile;
+  const navigate = useNavigate();
 
   const [showSettings, setShowSettings] = useImmer(false);
 
@@ -26,7 +27,7 @@ export function MainPage(): JSX.Element {
   const settingsCloseIcon: ReactNode = (
     <i className="bi bi-x-lg settings-icon"></i>
   );
-
+  
   return (
     <div className="container">
         <div className="row">

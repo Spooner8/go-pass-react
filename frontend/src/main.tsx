@@ -18,7 +18,37 @@ import 'primereact/resources/themes/bootstrap4-dark-blue/theme.css'
  * 
  * @returns {JSX.Element} The main application component.
  */
-const App = () => {
+const App = (): JSX.Element => {
+    useEffect(() => {
+        // Prevent mouse navigation (back and forward)
+        const preventNavigation = (event: PopStateEvent) => {
+            event.preventDefault();
+            window.history.pushState(null, "", window.location.href);
+        };
+
+        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+            event.preventDefault();
+            event.returnValue = ""; // Chrome requires returnValue to be set
+        };
+
+        const preventKeyNavigation = (event: KeyboardEvent) => {
+            if ((event.altKey && event.key === "ArrowLeft") || (event.altKey && event.key === "ArrowRight")) {
+                event.preventDefault();
+            }
+        };
+
+        window.history.pushState(null, "", window.location.href);
+        window.addEventListener("popstate", preventNavigation);
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        window.addEventListener("keydown", preventKeyNavigation);
+
+        return () => {
+            window.removeEventListener("popstate", preventNavigation);
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+            window.removeEventListener("keydown", preventKeyNavigation);
+        };
+    }, []);
+
     return (
         <HashRouter basename={"/"}>
             <Routes>
