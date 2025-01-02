@@ -84,3 +84,8 @@ To build a redistributable, production mode package, use
 ```bash
 wails build
 ```
+
+or as an NSIS-Installer use
+```bash
+wails build -nsis
+```

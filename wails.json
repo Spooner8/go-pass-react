@@ -9,5 +9,22 @@
   "author": {
     "name": "Spooner8 und SyntaxWizardBB",
     "email": "develop@swen-loeffler.ch"
+  },
+  "Info": {
+    "ProductVersion": "1.0.1",
+    "CompanyName": "Go-Pass",
+    "FileDescription": "Go-Pass",
+    "Copyright": "Spooner8 und SyntaxWizardBB",
+    "ProductName": "Go-Pass",
+    "Comments": "Simple Password Manager",
+    "FileAssociations": [
+      {
+        "ext": "gopass",
+        "name": "Go-Pass",
+        "description": "Go-Pass Password File",
+        "iconName": "icon",
+        "role": "Editor"
+      }
+    ]
   }
 }
