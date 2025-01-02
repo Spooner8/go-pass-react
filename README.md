@@ -44,11 +44,25 @@ func main() {
 Or visit [this website](https://acte.ltd/utils/randomkeygen) to generate a random key.
 Copy the 'Encryption key 256'
 
-### Requirements
+### Requirements / Installation
 
+**Install wails**
 ```bash
 go install github.com/wailsapp/wails/v2/cmd/wails@latest
 ```
+**Install go-bindata for loading enviroment variables into the build**
+```bash
+go install github.com/go-bindata/go-bindata/v3/...@latest
+```
+**Add GOPATH/bin to system path's if not exists**
+```bash
+$env:Path += ";$(go env GOPATH)\bin"
+```
+**Generate the env.go file**
+```bash
+go-bindata -o env.go .env
+```
+
 
 ## Live Development
 
@@ -68,5 +82,5 @@ to this in your browser, and you can call your Go code from devtools.
 To build a redistributable, production mode package, use
 
 ```bash
-wails build .
+wails build
 ```
