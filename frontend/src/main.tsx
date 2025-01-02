@@ -59,23 +59,6 @@ const App = (): JSX.Element => {
         </HashRouter>
     );
 };
-// window.addEventListener("mousedown", handleMouseButtonDown);
-
-// function handleMouseButtonDown(event: MouseEvent) {
-//   if (event.button === 0) {
-//     // left mouse button
-//   } else if (event.button === 1) {
-//     // middle mouse button
-//   } else if (event.button === 2) {
-//     // right mouse button
-//   } else if (event.button === 3) {
-//     event.preventDefault();
-//   } else if (event.button === 4) {
-//     event.preventDefault();
-//   } else {
-//     // other mouse button
-//   }
-// }
 
 const container = document.getElementById('root')
 const root = createRoot(container!)
