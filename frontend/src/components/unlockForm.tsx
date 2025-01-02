@@ -8,8 +8,22 @@ import {
     GetProfile,
     VerifyPassword,
 } from '../../wailsjs/go/main/App';
+import * as REGEX from '../utils/regex';
+import { Password } from 'primereact/password';
+import { Divider } from 'primereact/divider';
 
-export function UnlockForm() {
+const PASSWORD_REGEX: RegExp = REGEX.PASSWORD;
+const SAFE_NAME_REGEX: RegExp = REGEX.SAFE_NAME;
+
+/**
+ * @author Spooner8 and SyntayWizardBB - 2024
+ * 
+ * @description 
+ * This component is responsible for unlocking the safe and/or creating a new safe.
+ * 
+ * @returns {JSX.Element}
+ */
+export function UnlockForm(): JSX.Element {
     const [safeProfile, setSafeProfile] = useImmer<SafeProfile>(
         {} as SafeProfile
     );
@@ -22,15 +36,14 @@ export function UnlockForm() {
     const [newMasterPassword, setNewMasterPassword] = useImmer<string>('');
     const [confirmNewMasterPassword, setConfirmNewMasterPassword] =
         useImmer<string>('');
-    const [validateNewMasterPassword, setValidateNewMasterPassword] =
+    const [compareNewMasterPassword, setCompareNewMasterPassword] =
         useImmer<boolean>(false);
     const [errorMessage, setErrorMessage] = useImmer<string>('');
+    const [validateNewMasterPassword, setValidateNewMasterPassword] = useImmer<boolean>(false);
+
+    const [validateSafeName, setValidateSafeName] = useImmer<boolean>(false);
 
     const navigate = useNavigate();
-
-    useEffect(() => {
-        safePath ? console.log(safePath) : console.log('No safe path found');
-    }, []);
 
     const handleUnlock = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
@@ -38,13 +51,58 @@ export function UnlockForm() {
         response ? navigate('/mainpage', { state: safeProfile }) : setErrorMessage('Wrong password');
     };
 
+    const pw8Chars: Boolean = newMasterPassword.length >= 8 ? true : false;
+    const pwUpper: Boolean = /[A-Z]/.test(newMasterPassword) ? true : false;
+    const pwNumber: Boolean = /[0-9]/.test(newMasterPassword) ? true : false;
+    const pwSpecial: Boolean = /[(){}\[\]\\?~<>+!@#$%^&*._\-\/]/.test(newMasterPassword) ? true : false;
+
+    const pwSuccess = <i className="bi bi-check2-circle text-success"></i>;
+    const pwFail = <i className="bi bi-x-circle text-danger"></i>;
+
+    const pwFooter = (
+        <>
+            <Divider/>
+            <p className="mt-2">Vorgaben</p>
+            <ul className="pl-2 ml-2 mt-0 line-height-3">
+            <li style={{ listStyleType: 'none' }}>
+                {pw8Chars ? pwSuccess : pwFail} 8 Zeichen
+            </li>
+            <li style={{ listStyleType: 'none' }}>
+                {pwUpper ? pwSuccess : pwFail} Ein Grossbuchstabe
+            </li>
+            <li style={{ listStyleType: 'none' }}>
+                {pwNumber ? pwSuccess : pwFail} Eine Zahl
+            </li>
+            <li style={{ listStyleType: 'none' }}>
+                {pwSpecial ? pwSuccess : pwFail} Ein Sonderzeichen
+            </li>
+        </ul>
+        </>
+    )
+
     useEffect(() => {
         if (newMasterPassword !== confirmNewMasterPassword) {
-            setValidateNewMasterPassword(false);
+            setCompareNewMasterPassword(false);
         } else {
-            setValidateNewMasterPassword(true);
+            setCompareNewMasterPassword(true);
         }
     }, [newMasterPassword, confirmNewMasterPassword]);
+
+    useEffect(() => {
+        if (PASSWORD_REGEX.test(newMasterPassword)) {
+            setValidateNewMasterPassword(true);
+        } else {
+            setValidateNewMasterPassword(false);
+        }
+    },[newMasterPassword]);
+
+    useEffect(() => {
+        if (SAFE_NAME_REGEX.test(newSafeName)) {
+            setValidateSafeName(true);
+        } else {
+            setValidateSafeName(false);
+        }
+    }, [newSafeName]);
 
     const handleCreateNewSafe = async (
         event: React.MouseEvent<HTMLButtonElement>
@@ -64,7 +122,7 @@ export function UnlockForm() {
                 setCreateNew(false);
                 setConfirmNewMasterPassword('');
                 setNewMasterPassword('');
-                setValidateNewMasterPassword(false);
+                setCompareNewMasterPassword(false);
             });
         } catch (error: any) {
             setErrorMessage('Error creating safe');
@@ -92,18 +150,29 @@ export function UnlockForm() {
         <>
             <div className='card'>
                 <div className='card-body'>
-                    <h5 className='card-title'>GoPass Tresor entsperren</h5>
-                    {<small className='card-text'>{safePath}</small>}
-                    <input
-                        className='form-control mb-4'
-                        id='password'
-                        type='password'
-                        placeholder='Masterpasswort'
-                        aria-label='Masterpasswort'
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        disabled={!safePath}
-                    />
+                    {!createNew && (
+                        <>
+                        <div className='d-flex justify-content-between align-items-top'>
+                            <h5 className='card-title'>GoPass Tresor entsperren</h5>
+                            {safePath && <button title='Tresor schliessen' className='close' onClick={() => { setSafePath('')}} aria-label='Close'><i className="bi bi-x-lg settings-icon"></i></button>}
+                        </div>
+                            <small className='card-text'>{safePath}</small>
+                            <div className='mt-3 '>
+                                <Password
+                                    className='mb-4 password-field'
+                                    id='password'
+                                    placeholder='Masterpasswort'
+                                    aria-label='Masterpasswort'
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                    toggleMask
+                                    feedback={false}
+                                    disabled={!safePath}
+                                    />
+                            </div>
+                        </>
+                    )}
                     {safePath ? (
                         <div className='row'>
                             <div className='col-sm-12 col-md-6'>
@@ -131,7 +200,7 @@ export function UnlockForm() {
                     ) : (
                         <>
                             <div className='row'>
-                                <div className='col-sm-12 col-md-6'>
+                                <div className='col-sm-12 col-md-6 mb-2'>
                                     <button
                                         className='btn btn-primary w-100'
                                         id='btn-new'
@@ -143,7 +212,7 @@ export function UnlockForm() {
                                         Neuer Tresor
                                     </button>
                                 </div>
-                                <div className='col-sm-12 col-md-6'>
+                                <div className='col-sm-12 col-md-6 mb-2'>
                                     <button
                                         className='btn btn-primary w-100'
                                         id='btn-open'
@@ -165,10 +234,13 @@ export function UnlockForm() {
                                             onChange={(e) =>
                                                 setNewSafeName(e.target.value)
                                             }
-                                            className='form-control mb-4'
+                                            className={`form-control ${!newSafeName || !validateSafeName ? 'is-invalid' : ''}`}
                                             placeholder='Tresorname'
                                         />
-                                        <div className='input-group mb-4'>
+                                        <small className='text-info'>
+                                            {!validateSafeName && '2-50 Zeichen | Erlaubt: a-z, A-Z, 0-9, Leerzeichen _ - .'}
+                                        </small>
+                                        <div className='input-group mt-3'>
                                             <button
                                                 className='btn btn-primary'
                                                 type='button'
@@ -182,37 +254,34 @@ export function UnlockForm() {
                                                 id='newPath'
                                                 aria-describedby='btn-chooseFolder'
                                                 aria-label='Speicherort'
-                                                className='form-control'
+                                                className={`form-control ${!newSafePath ? 'is-invalid' : ''}`}
                                                 placeholder='Speicherort'
                                                 readOnly
                                                 value={newSafePath}
                                             />
                                         </div>
-                                        <input
-                                            type='password'
-                                            id='newPassword'
-                                            placeholder='Neuws Passwort'
-                                            onChange={(e) =>
-                                                setNewMasterPassword(
-                                                    e.target.value
-                                                )
-                                            }
-                                            className='form-control mb-4'
-                                        />
-                                        <input
-                                            type='password'
-                                            id='confirmNewPassword'
-                                            placeholder='Neues Passwort bestätigen'
-                                            onChange={(e) =>
-                                                setConfirmNewMasterPassword(
-                                                    e.target.value
-                                                )
-                                            }
-                                            className='form-control'
-                                        />
-                                        {!validateNewMasterPassword && (
+                                        <div className='mt-3'>
+                                            <Password id='newPassword'
+                                                    placeholder='Neues Passwort'
+                                                    value={newMasterPassword}
+                                                    onChange={(e) => setNewMasterPassword(e.target.value)}
+                                                    toggleMask
+                                                    footer={pwFooter}
+                                                    invalid={!newMasterPassword || !validateNewMasterPassword}
+                                                    promptLabel="Passwort eingeben" weakLabel="Zu schach" mediumLabel="Fast gut" strongLabel="Stark"/>
+                                        </div>
+                                        <div className='mt-3'>
+                                            <Password id='confirmNewPassword'
+                                                    placeholder='Neues Passwort bestätigen'
+                                                    value={confirmNewMasterPassword}
+                                                    onChange={(e) => setConfirmNewMasterPassword(e.target.value)}
+                                                    toggleMask
+                                                    feedback={false}
+                                                    invalid={!confirmNewMasterPassword || !compareNewMasterPassword}/>
+                                        </div>
+                                        {!compareNewMasterPassword && (
                                             <div className='row'>
-                                                <small className='text-danger col-sm-12'>
+                                                <small className='text-info col-sm-12'>
                                                     Passwörter stimmen nicht
                                                     überein
                                                 </small>
@@ -226,6 +295,8 @@ export function UnlockForm() {
                                                 !newSafePath ||
                                                 !newMasterPassword ||
                                                 !confirmNewMasterPassword ||
+                                                !compareNewMasterPassword ||
+                                                !validateSafeName ||
                                                 !validateNewMasterPassword
                                             }
                                             onClick={handleCreateNewSafe}

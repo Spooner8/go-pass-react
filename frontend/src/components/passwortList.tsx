@@ -1,4 +1,5 @@
-import React, { useState, useEffect, ReactNode } from 'react';
+import React, { useEffect, ReactNode } from 'react';
+import { useImmer } from 'use-immer';
 import { PasswordEntry } from '../models/passwordEntry';
 import { SafeProfile } from '../models/safeProfile';
 import { PwdClipboard } from './pwdClipboard';
@@ -6,21 +7,41 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
 import { UpdateProfile, GetProfileFromPath, GenerateNewPassword } from '../../wailsjs/go/main/App';
+import { Password } from 'primereact/password';
 
 interface Props {
     safeProfile: SafeProfile;
 }
 
-export function PasswortList({ safeProfile }: Props) {
-    const [profile, setProfile] = useState<SafeProfile>(safeProfile);
-    const [globalFilter, setGlobalFilter] = useState<string>('');
+/**
+ * @author Spooner8 and SyntaxWizardBB - 2024
+ * 
+ * @description
+ * This component is responsible for rendering the password list and the password details.
+ * It contains the following features:
+ * - Add new password
+ * - Remove password
+ * - Edit password
+ * - Save password
+ * - Copy password to clipboard
+ * - Show password
+ * - Generate new password * 
+ * 
+ * @param {Props} { safeProfile } - The safe profile given from unlocking the safe. 
+ * @returns {JSX.Element} - A JSX Element containing the password list and the password details.
+ */
+export function PasswortList({ safeProfile }: Props): JSX.Element {
+    const [profile, setProfile] = useImmer<SafeProfile>(safeProfile);
+    const [globalFilter, setGlobalFilter] = useImmer<string>('');
     const [selectedPassword, setSelectedPassword] =
-        useState<PasswordEntry | null>(null);
-    const [editing, setEditing] = useState<boolean>(false);
-    const [showPassword, setShowPassword] = useState<boolean>(false);
-    const [errorMessage, setErrorMessage] = useState<string>('');
-    const [showProgress, setShowProgress] = useState<boolean>(false);
-    const [pwCopyEnabled, setPwCopyEnabled] = useState<boolean>(false);
+    useImmer<PasswordEntry | null>(null);
+    const [editing, setEditing] = useImmer<boolean>(false);
+    const [errorMessage, setErrorMessage] = useImmer<string>('');
+    const [showProgress, setShowProgress] = useImmer<boolean>(false);
+    const [pwCopyEnabled, setPwCopyEnabled] = useImmer<boolean>(false);
+
+    const [title, setTitle] = useImmer<string>('');
+    const [password, setPassword] = useImmer<string>('');
 
     useEffect(() => {
         let ctrlDown = false;
@@ -50,11 +71,13 @@ export function PasswortList({ safeProfile }: Props) {
 
     useEffect(() => {
         setErrorMessage('');
+        setShowProgress(false);
         selectedPassword?.password ? setPwCopyEnabled(true) : setPwCopyEnabled(false);
+        setTitle(selectedPassword?.title || '');
+        setPassword(selectedPassword?.password || '');
     }, [selectedPassword]);
 
     useEffect(() => {
-        setShowPassword(false);
         setShowProgress(false);
         setSelectedPassword(prev => {
             return prev ? profile.passwords.find(p => p.id === prev.id) || null : null
@@ -64,7 +87,7 @@ export function PasswortList({ safeProfile }: Props) {
     const handleAddPassword = () => {
         setErrorMessage('');
         if (editing && !selectedPassword?.id) return;
-        profile.passwords.push({
+        const newPassword: PasswordEntry = {
             id: '',
             title: '',
             url: '',
@@ -72,10 +95,31 @@ export function PasswortList({ safeProfile }: Props) {
             password: '',
             notes: '',
             createdAt: new Date(),
+        };
+
+        setProfile(draft => {
+            draft.passwords.push(newPassword);
         });
 
-        setSelectedPassword(profile.passwords[profile.passwords.length - 1]);
+        setSelectedPassword(newPassword);
         setEditing(true);
+    };
+
+    const handleRemovePassword = async () => {
+        setErrorMessage('');
+        if (!selectedPassword?.id) return;
+
+        const updatedPasswords = profile.passwords.filter(p => p.id !== selectedPassword?.id);
+        const updatedProfile = { ...profile, passwords: updatedPasswords };
+        setProfile(updatedProfile);
+
+        await UpdateProfile(updatedProfile).then(async () => {
+            await GetProfileFromPath(updatedProfile.filepath).then((response) => {
+                setProfile(response);
+                setEditing(false);
+                setSelectedPassword(null);
+            });
+        });
     };
 
     const updateSafeProfile = async () => {
@@ -95,6 +139,13 @@ export function PasswortList({ safeProfile }: Props) {
             });
         });
     };
+
+
+    useEffect(() => {
+        GetProfileFromPath(safeProfile.filepath).then((response) => {
+            setProfile(response);
+        });
+    }, []);
 
     const dateBodyTemplate = (rowData: PasswordEntry) => {
         const date = rowData.updatedAt && new Date(rowData.updatedAt || '');
@@ -146,7 +197,7 @@ export function PasswortList({ safeProfile }: Props) {
                 selection={selectedPassword}
                 onSelectionChange={(e) => {
                     setEditing(false);
-                    setSelectedPassword(e.value as PasswordEntry)
+                    setSelectedPassword(e.value as PasswordEntry);
                 }}
                 rows={3}
                 scrollable
@@ -176,32 +227,46 @@ export function PasswortList({ safeProfile }: Props) {
             <div className='row mt-4'>
                 <div className='col-sm-12'>
                     <div className='card'>
-                        <div className='card-header d-flex justify-content-end'>
-                        {editing && (
+                        <div className='card-header d-flex justify-content-between'>
+                        <p id='pwdNote' className='form-text text-info'>
+                            {(!password || !title) && selectedPassword ? 'Titel und Passwort dürfen nicht leer sein.' : ''}
+                        </p>
+                            <div className=''>
+                                {editing && (
                                 <button
-                                    className='btn btn-success me-2 save-entry'
-                                    title='Speichern'
-                                    onClick={updateSafeProfile}
+                                className='btn btn-success me-2 save-entry'
+                                title='Speichern'
+                                onClick={updateSafeProfile}
+                                disabled={!password || !title}
                                 >
-                                    <i className="bi bi-floppy"></i>
+                                        <i className="bi bi-floppy"></i>
+                                    </button>
+                                )}
+                                <button className='btn btn-danger me-2' title='Löschen' onClick={handleRemovePassword} style={{ display: selectedPassword?.id && !editing ? 'inline' : 'none' }}>
+                                    <i className="bi bi-trash"></i>
                                 </button>
-                            )}
-                            <button
-                                className='btn btn-primary'
-                                title={editing ? 'Abbrechen' : 'Bearbeiten'}
-                                onClick={() => {
-                                    !selectedPassword?.id && safeProfile.passwords.pop();
-                                    setEditing(!editing)
-                                }}
-                                disabled={!selectedPassword}
-                            >
-                                {editing ? abortBtn : editBtn}
-                            </button>
+                                <button
+                                    className='btn btn-primary'
+                                    title={editing ? 'Abbrechen' : 'Bearbeiten'}
+                                    onClick={() => {
+                                        if (!selectedPassword?.id) {
+                                            setProfile(draft => {
+                                                draft.passwords.pop();
+                                            });
+                                        }
+                                        setEditing(!editing)
+                                    }}
+                                    disabled={!selectedPassword}
+                                    >
+                                    {editing ? abortBtn : editBtn}
+                                </button>
+                            </div>
+
                         </div>
 
                         <div className='card-body'>
                             <div className='row'>
-                                <div className='col-sm-12 col-md-6'>
+                                <div className='col-sm-12 col-md-8'>
                                     <div className='hstack gap-3 mb-2'>
                                         <label
                                             htmlFor='title'
@@ -213,14 +278,21 @@ export function PasswortList({ safeProfile }: Props) {
                                             type='text'
                                             className={`form-control ${
                                                 !editing ? 'editDetail' : ''
-                                            }`}
+                                            } ${!title && selectedPassword ? 'is-invalid' : ''}`}
                                             id='title'
                                             value={selectedPassword?.title || ''}
-                                            onChange={(e) => setSelectedPassword({
-                                                ...selectedPassword,
-                                                title: e.target.value
-                                            } as PasswordEntry)}
+                                            onChange={(e) =>
+                                                {
+                                                    setSelectedPassword({
+                                                        ...selectedPassword,
+                                                        title: e.target.value
+                                                    } as PasswordEntry)
+
+                                                    setTitle(e.target.value);
+                                                }
+                                            }
                                             readOnly={!editing}
+                                            required
                                         />
                                     </div>
                                     <div className='hstack gap-3 mb-2'>
@@ -273,70 +345,58 @@ export function PasswortList({ safeProfile }: Props) {
                                         >
                                             Passwort
                                         </label>
-                                        <div className='input-group'>
-                                            <input
-                                                type={`${
-                                                    showPassword
-                                                        ? 'text'
-                                                        : 'password'
-                                                }`}
-                                                className={`form-control ${
-                                                    !editing ? 'editDetail' : ''
-                                                }`}
-                                                id='password'
-                                                value={selectedPassword?.password || ''}
-                                                onChange={(e) => setSelectedPassword({
-                                                    ...selectedPassword,
-                                                    password: e.target.value
-                                                } as PasswordEntry)}
-                                                readOnly={!editing}
-                                                required
-                                            />
-                                            <span className='input-group-text password-toggle'
-                                                onClick={async () => {
-                                                    if (editing && selectedPassword) {
-                                                        setSelectedPassword({
-                                                            ...selectedPassword,
-                                                            password: await GenerateNewPassword() || selectedPassword?.password || ''
-                                                        } as PasswordEntry);
+                                        <div className='d-flex w-100 password-input'>
+                                            <Password id='newPassword'
+                                                        value={selectedPassword?.password || ''}
+                                                        className='password-field flex-grow-1 me-1'
+                                                        onChange={(e) =>
+                                                            {
+                                                                setSelectedPassword({
+                                                                    ...selectedPassword,
+                                                                    password: e.target.value
+                                                                } as PasswordEntry)
+                                                                setPassword(e.target.value);
+                                                            }
+                                                        } 
+                                                        toggleMask
+                                                        feedback={false}
+                                                        readOnly={!editing}
+                                                        invalid={!password && !!selectedPassword}/>
+                                            <span className='input-group-text password-extras me-1'
+                                                onClick={async () =>
+                                                    {
+                                                        if (editing && selectedPassword) {
+                                                            setSelectedPassword({
+                                                                ...selectedPassword,
+                                                                password: await GenerateNewPassword() || selectedPassword?.password || ''
+                                                            } as PasswordEntry);
+                                                        }
+
+                                                        setPassword(selectedPassword?.password || '');
                                                     }
-                                                }}
+                                                }
                                             >
                                                 <i
                                                     className={`bi bi-dice-3`}
                                                 ></i>
                                             </span>
-                                            <span className='input-group-text password-toggle'                                            
+                                            <span className='input-group-text password-extras' 
+                                            title='In die Zwischenablage kopieren'                                           
                                                 onClick={() => { selectedPassword?.password && setShowProgress(true); }}
                                             >
                                                 <i
                                                     className={`bi bi-clipboard`}
                                                 ></i>
                                             </span>
-                                            <span className='input-group-text password-toggle'                                            
-                                                onClick={() =>
-                                                    setShowPassword(
-                                                        !showPassword
-                                                    )
-                                                }
-                                            >
-                                                <i
-                                                    className={`bi bi-eye${
-                                                        showPassword
-                                                            ? ''
-                                                            : '-slash'
-                                                    }`}
-                                                ></i>
-                                            </span>
                                         </div>
-                                    </div>
+                                    </div>                                        
                                     {showProgress && (
                                         <div className='col-sm-12 col-md-8 ps-md-3 ms-auto'>
                                             <PwdClipboard pwd={selectedPassword?.password || ''} show={setShowProgress}/>
                                         </div>
                                     )}
                                 </div>
-                                <div className='col-sm-12 col-md-6 d-flex flex-column'>
+                                <div className='col-sm-12 col-md-4 d-flex flex-column'>
                                     <label htmlFor='notes' className='col-sm-4'>
                                         Notizen
                                     </label>

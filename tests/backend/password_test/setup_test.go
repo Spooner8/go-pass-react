@@ -11,6 +11,8 @@ import (
 
 var originalSecretKey string
 
+// TestMain sets up the test suite by setting the SECRET_KEY environment variable to a random 32 byte key
+// and restores the original SECRET_KEY after the tests have finished
 func TestMain(m *testing.M) {
 	fmt.Println("Setting up the test suite...")
 	originalSecretKey = os.Getenv("SECRET_KEY")
@@ -33,6 +35,7 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
+// generate32byteKey generates a random 32 byte key and returns it as a hex encoded string for the test suite
 func generate32byteKey() string {
 	key := make([]byte, 16)
 	_, err := rand.Read(key)

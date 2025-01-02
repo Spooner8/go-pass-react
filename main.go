@@ -2,6 +2,8 @@ package main
 
 import (
 	"embed"
+	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/gommon/log"
@@ -16,10 +18,27 @@ var assets embed.FS
 func main() {
 	app := NewApp()
 
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+    err := godotenv.Load()
+    if err != nil {
+        log.Warn("No .env file found, using embedded environment variables")
+        
+        envData, err := Asset(".env")
+        if err != nil {
+            log.Fatal("Error loading embedded .env file")
+        }
+
+        envLines := strings.Split(string(envData), "\n")
+        for _, line := range envLines {
+            if line == "" || strings.HasPrefix(line, "#") {
+                continue
+            }
+            parts := strings.SplitN(line, "=", 2)
+            if len(parts) != 2 {
+                continue
+            }
+            os.Setenv(parts[0], parts[1])
+        }
+    }
 
 	// Create application with options
 	err = wails.Run(&options.App{

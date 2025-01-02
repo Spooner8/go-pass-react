@@ -18,6 +18,8 @@ export function Quit():Promise<void>;
 
 export function SelectDir():Promise<string>;
 
+export function UpdateMasterPassword(arg1:string):Promise<string>;
+
 export function UpdateProfile(arg1:json.RawMessage):Promise<string>;
 
 export function VerifyPassword(arg1:string,arg2:string):Promise<boolean>;

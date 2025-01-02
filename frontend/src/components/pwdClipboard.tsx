@@ -6,7 +6,16 @@ interface props {
     show: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export function PwdClipboard(props: props) {
+/**
+ * @author Spooner8 and SyntaxWizardBB - 2024
+ * 
+ * @description
+ * Containes the password clipboard component that is used to copy the password to the clipboard and show a progress bar to indicate the time left to copy the password.
+ * 
+ * @param {props} props The properties of the component. It contains the password to copy and a function to hide the component.
+ * @returns {JSX.Element} The password clipboard component.
+ */
+export function PwdClipboard(props: props): JSX.Element {
 
     const secondsToCopy = 15;
     const [timer, setTimer] = useState(100);

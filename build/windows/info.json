@@ -7,9 +7,10 @@
 			"ProductVersion": "{{.Info.ProductVersion}}",
 			"CompanyName": "{{.Info.CompanyName}}",
 			"FileDescription": "{{.Info.ProductName}}",
-			"LegalCopyright": "{{.Info.Copyright}}",
+			"Copyright": "{{.Info.Copyright}}",
 			"ProductName": "{{.Info.ProductName}}",
-			"Comments": "{{.Info.Comments}}"
+			"Comments": "{{.Info.Comments}}",
+			"FileAssociations": "{{.Info.FileAssociations}}"
 		}
 	}
 }

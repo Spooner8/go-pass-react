@@ -34,6 +34,10 @@ export function SelectDir() {
   return window['go']['main']['App']['SelectDir']();
 }
 
+export function UpdateMasterPassword(arg1) {
+  return window['go']['main']['App']['UpdateMasterPassword'](arg1);
+}
+
 export function UpdateProfile(arg1) {
   return window['go']['main']['App']['UpdateProfile'](arg1);
 }
