@@ -2,44 +2,47 @@
 package password_test
 
 import (
-	"go-pass-react/controllers/passwordHelpers"
-	"testing"
+    "go-pass-react/controllers/passwordHelpers"
+    "os"
+    "testing"
 )
 
-// TestHashPassword tests the HashPassword function basic functionality
-func TestEncryptAES(t *testing.T) {
-	pwd := "mysecretpassword"
-	encryptedPassword, err := passwordHelpers.EncryptAES(pwd)
-	if err != nil {
-		t.Fatalf("Expected no error, got: %v", err)
-	}
+func TestEncryptAESBytes(t *testing.T) {
+    _ = os.Setenv("SECRET_KEY", "0123456789abcdef") // 16 bytes for AES-128
 
-	if len(encryptedPassword) == 0 {
-		t.Fatalf("Expected an encrypted password, got an empty string")
-	}
+    data := []byte("mysecretdata")
+    encrypted, err := passwordHelpers.EncryptAESBytes(data)
+    if err != nil {
+        t.Fatalf("Expected no error, got: %v", err)
+    }
 
-	t.Logf("password to encrypt %s:", pwd)
-	t.Logf("Encrypted password: %s", encryptedPassword)
+    if len(encrypted) == 0 {
+        t.Fatalf("Expected encrypted data, got empty slice")
+    }
+
+    t.Logf("Original data: %s", data)
+    t.Logf("Encrypted data: %x", encrypted)
 }
 
-// TestDecryptAES tests the DecryptAES function basic functionality by encrypting a password and then decrypting it
-func TestDecryptAES(t *testing.T) {
-	pwd := "mysecretpassword"
-	encryptedPassword, err := passwordHelpers.EncryptAES(pwd)
-	if err != nil {
-		t.Fatalf("Expected no error, got: %v", err)
-	}
+func TestDecryptAESBytes(t *testing.T) {
+    _ = os.Setenv("SECRET_KEY", "0123456789abcdef") // 16 bytes for AES-128
 
-	decryptedPassword, err := passwordHelpers.DecryptAES(encryptedPassword)
-	if err != nil {
-		t.Fatalf("Expected no error, got: %v", err)
-	}
+    data := []byte("mysecretdata")
+    encrypted, err := passwordHelpers.EncryptAESBytes(data)
+    if err != nil {
+        t.Fatalf("Expected no error, got: %v", err)
+    }
 
-	if decryptedPassword != pwd {
-		t.Fatalf("Expected decrypted password to be %s, got %s", pwd, decryptedPassword)
-	}
+    decrypted, err := passwordHelpers.DecryptAESBytes(encrypted)
+    if err != nil {
+        t.Fatalf("Expected no error, got: %v", err)
+    }
 
-	t.Logf("password: %s", pwd)
-	t.Logf("Encrypted password: %s", encryptedPassword)
-	t.Logf("Decrypted password: %s", decryptedPassword)
+    if string(decrypted) != string(data) {
+        t.Fatalf("Expected decrypted data to be %s, got %s", data, decrypted)
+    }
+
+    t.Logf("Original data: %s", data)
+    t.Logf("Encrypted data: %x", encrypted)
+    t.Logf("Decrypted data: %s", decrypted)
 }

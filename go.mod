@@ -1,8 +1,6 @@
 module go-pass-react
 
-go 1.22.0
-
-toolchain go1.23.3
+go 1.22.12
 
 require (
 	github.com/atotto/clipboard v0.1.4

@@ -67,3 +67,5 @@ Thumbs.db
 
 # package.json.md5 file
 frontend/package.json.md5
+
+vendor/

@@ -36,6 +36,11 @@ func (p *SafeProfile) Create() string {
 	if err != nil {
 		return fmt.Sprintf("error while marshal: %s", err.Error())
 	}
+
+	encryptedData, err := passwordHelpers.EncryptAESBytes(jsonData)
+    if err != nil {
+        return fmt.Sprintf("error while encrypt: %s", err.Error())
+    }
 	
 	file, err := os.OpenFile(p.FilePath, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0644)
 	if err != nil {
@@ -46,7 +51,7 @@ func (p *SafeProfile) Create() string {
 	}
 	defer file.Close()
 
-	_, err = file.Write(jsonData)
+	_, err = file.Write(encryptedData)
 	if err != nil {
 		return fmt.Sprintf("error while writing: %s", err.Error())
 	}
@@ -64,13 +69,18 @@ func (p *SafeProfile) Update() string {
         return fmt.Sprintf("error: %s", err.Error())
     }
 
+	encryptedData, err := passwordHelpers.EncryptAESBytes(jsonData)
+    if err != nil {
+        return fmt.Sprintf("error while encrypt: %s", err.Error())
+    }
+
     file, err := os.OpenFile(p.FilePath, os.O_RDWR|os.O_TRUNC, 0644)
     if err != nil {
         return fmt.Sprintf("error: %s", err.Error())
     }
     defer file.Close()
 
-    _, err = file.Write(jsonData)
+    _, err = file.Write(encryptedData)
     if err != nil {
         return fmt.Sprintf("error: %s", err.Error())
     }
